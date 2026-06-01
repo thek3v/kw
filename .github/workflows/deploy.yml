@@ -78,39 +78,76 @@ jobs:
       - name: Inspect downloaded artifact
         run: |
           echo "::group::Downloaded artifact"
-          find downloaded -maxdepth 4 -type f | sort
+          echo "Current directory:"
+          pwd
+          echo ""
+          echo "Downloaded files:"
+          find downloaded -maxdepth 6 -type f | sort
+          echo "::endgroup::"
+
+      - name: Resolve downloaded artifact root
+        id: artifact_root
+        run: |
+          echo "::group::Resolve downloaded artifact root"
+
+          VERSION_FILE=$(find downloaded -type f -name VERSION | head -n 1)
+
+          if [ -z "$VERSION_FILE" ]; then
+            echo "::error::VERSION file not found inside downloaded artifact"
+            echo "Files found:"
+            find downloaded -maxdepth 6 -type f | sort
+            exit 1
+          fi
+
+          ROOT_DIR=$(dirname "$VERSION_FILE")
+
+          echo "Resolved VERSION file: $VERSION_FILE"
+          echo "Resolved artifact root: $ROOT_DIR"
+
+          echo "root=$ROOT_DIR" >> "$GITHUB_OUTPUT"
+
           echo "::endgroup::"
 
       - name: Validate downloaded artifact
         run: |
-          test -f downloaded/VERSION
-          test -f downloaded/ARTIFACT_NAME
-          test -f downloaded/web/index.html
-          test -f downloaded/web/styles.css
-          test -f downloaded/web/script.js
-          test -d downloaded/web/assets
+          ROOT="${{ steps.artifact_root.outputs.root }}"
+
+          echo "Validating artifact at root: $ROOT"
+
+          test -f "$ROOT/VERSION"
+          test -f "$ROOT/ARTIFACT_NAME"
+          test -f "$ROOT/web/index.html"
+          test -f "$ROOT/web/styles.css"
+          test -f "$ROOT/web/script.js"
+          test -d "$ROOT/web/assets"
 
       - name: Prepare GitHub Pages site
         if: ${{ inputs.environment == 'dev' }}
         run: |
+          ROOT="${{ steps.artifact_root.outputs.root }}"
+
           mkdir -p site
 
-          cp downloaded/web/index.html site/
-          cp downloaded/web/styles.css site/
-          cp downloaded/web/script.js site/
-          cp -r downloaded/web/assets site/
-          cp downloaded/VERSION site/
+          cp "$ROOT/web/index.html" site/
+          cp "$ROOT/web/styles.css" site/
+          cp "$ROOT/web/script.js" site/
+          cp -r "$ROOT/web/assets" site/
+          cp "$ROOT/VERSION" site/
 
           echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
           echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
-          echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
+          echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt"
 
-          if [ -f downloaded/BUILD_COMMIT ]; then
-            echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
+          if [ -f "$ROOT/BUILD_COMMIT" ]; then
+            echo "Commit: $(cat "$ROOT/BUILD_COMMIT")" >> site/DEPLOYMENT_INFO.txt
           fi
 
-          if [ -f downloaded/BUILD_DATE ]; then
-            echo "Build date: $(cat downloaded/BUILD_DATE)" >> site/DEPLOYMENT_INFO.txt
+          if [ -f "$ROOT/BUILD_DATE" ]; then
+            echo "Build date: $(cat "$ROOT/BUILD_DATE")" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+          if [ -f "$ROOT/BUILD_TIMESTAMP" ]; then
+            echo "Build timestamp: $(cat "$ROOT/BUILD_TIMESTAMP")" >> site/DEPLOYMENT_INFO.txt
           fi
 
       - name: Configure GitHub Pages
