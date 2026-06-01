@@ -3,6 +3,7 @@ name: Integration Build
 on:
   push:
     branches:
+      - main
       - develop
 
 jobs:
@@ -24,7 +25,7 @@ jobs:
         run: |
           VERSION=$(cat VERSION)
           if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
-            echo "Develop builds must use a SNAPSHOT version"
+            echo "Integration builds must use a SNAPSHOT version"
             exit 1
           fi
 
