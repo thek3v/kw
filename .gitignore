@@ -1,0 +1,23 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Variables de entorno
+.env
+.env.local
+
+# Dependencias futuras
+node_modules/
+
+# Builds futuros
+dist/
+build/
+
+# Deployments locales
+deployments/

@@ -1,0 +1,69 @@
+name: CI Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  validate-static-web:
+    name: Validate static web project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check required root files
+        run: |
+          test -f README.md
+          test -f VERSION
+          test -f .gitignore
+
+      - name: Check required web files
+        run: |
+          test -d web
+          test -f web/index.html
+          test -f web/styles.css
+          test -f web/script.js
+          test -d web/assets
+
+      - name: Check GitHub Actions workflows exist
+        run: |
+          test -f .github/workflows/ci-checks.yml
+          test -f .github/workflows/integration.yml
+          test -f .github/workflows/deploy-dev.yml
+
+      - name: Check forbidden files
+        run: |
+          if find . -name ".env" -o -name ".env.local" -o -name "*.log" -o -name "Thumbs.db" -o -name ".DS_Store" | grep .; then
+            echo "Forbidden file found"
+            exit 1
+          fi
+
+      - name: Validate HTML basic structure
+        run: |
+          grep -qi "<!DOCTYPE html>" web/index.html
+          grep -qi "<html" web/index.html
+          grep -qi "<head>" web/index.html
+          grep -qi "<body>" web/index.html
+          grep -qi "</html>" web/index.html
+          grep -qi 'rel="stylesheet"' web/index.html
+          grep -qi 'script src="script.js"' web/index.html
+
+      - name: Validate CSS is not empty
+        run: |
+          test -s web/styles.css
+
+      - name: Validate JS is not empty
+        run: |
+          test -s web/script.js
+
+      - name: Validate VERSION format
+        run: |
+          grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-SNAPSHOT)?$' VERSION

@@ -1,0 +1,58 @@
+name: Integration Build
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-snapshot:
+    name: Build snapshot artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(cat VERSION)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate snapshot version
+        run: |
+          VERSION=$(cat VERSION)
+          if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
+            echo "Develop builds must use a SNAPSHOT version"
+            exit 1
+          fi
+
+      - name: Create build metadata
+        run: |
+          echo "${{ steps.version.outputs.version }}" > BUILD_VERSION
+          echo "${{ github.sha }}" > BUILD_COMMIT
+          echo "${{ github.ref_name }}" > BUILD_BRANCH
+          echo "SNAPSHOT" > BUILD_TYPE
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > BUILD_DATE
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p build/web
+          cp web/index.html build/web/
+          cp web/styles.css build/web/
+          cp web/script.js build/web/
+          cp -r web/assets build/web/
+          cp README.md build/
+          cp VERSION build/
+          cp BUILD_VERSION build/
+          cp BUILD_COMMIT build/
+          cp BUILD_BRANCH build/
+          cp BUILD_TYPE build/
+          cp BUILD_DATE build/
+
+      - name: Upload snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kw-web-${{ steps.version.outputs.version }}-${{ github.run_number }}
+          path: build/

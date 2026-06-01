@@ -1,0 +1,66 @@
+name: Deploy DEV
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-dev
+  cancel-in-progress: true
+
+jobs:
+  deploy-dev:
+    name: Deploy web to DEV
+    runs-on: ubuntu-latest
+
+    environment:
+      name: dev
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate project before deploy
+        run: |
+          test -f VERSION
+          test -f web/index.html
+          test -f web/styles.css
+          test -f web/script.js
+          test -d web/assets
+
+      - name: Validate DEV uses snapshot version
+        run: |
+          VERSION=$(cat VERSION)
+          if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
+            echo "DEV deploys must use a SNAPSHOT version"
+            exit 1
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare site
+        run: |
+          mkdir -p site
+          cp web/index.html site/
+          cp web/styles.css site/
+          cp web/script.js site/
+          cp -r web/assets site/
+          cp VERSION site/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
