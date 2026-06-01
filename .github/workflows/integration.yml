@@ -1,45 +1,33 @@
-name: Integration Build
+name: Integration
 
-run-name: Integration Build - DEV snapshot
+run-name: ${{ github.event.head_commit.message }}
 
 on:
-  workflow_run:
-    workflows:
-      - CI Checks
-    types:
-      - completed
+  push:
+    branches:
+      - develop
 
 jobs:
   build-snapshot:
     name: Build DEV snapshot artifact
     runs-on: ubuntu-latest
 
-    if: >
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      (
-        github.event.workflow_run.head_branch == 'main' ||
-        github.event.workflow_run.head_branch == 'develop'
-      )
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Read version and build metadata
         id: meta
         run: |
           VERSION=$(cat VERSION)
-          SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           BUILD_TS=$(date -u +"%Y%m%d_%H%M")
-          ARTIFACT_NAME="deployment-dev-snapshot-${VERSION}-${BUILD_TS}-${SHORT_SHA}"
+          ARTIFACT_NAME="kw-web-${VERSION}-${BUILD_TS}-${SHORT_SHA}"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "build_ts=$BUILD_TS" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Validate snapshot version
         run: |
@@ -49,11 +37,11 @@ jobs:
             exit 1
           fi
 
-      - name: Create build metadata files
+      - name: Create build metadata
         run: |
           echo "${{ steps.meta.outputs.version }}" > BUILD_VERSION
-          echo "${{ github.event.workflow_run.head_sha }}" > BUILD_COMMIT
-          echo "${{ github.event.workflow_run.head_branch }}" > BUILD_BRANCH
+          echo "${{ github.sha }}" > BUILD_COMMIT
+          echo "${{ github.ref_name }}" > BUILD_BRANCH
           echo "SNAPSHOT" > BUILD_TYPE
           echo "${{ steps.meta.outputs.short_sha }}" > BUILD_SHORT_SHA
           echo "${{ steps.meta.outputs.build_ts }}" > BUILD_TIMESTAMP
@@ -63,6 +51,7 @@ jobs:
       - name: Prepare DEV snapshot artifact
         run: |
           mkdir -p build/web
+
           cp web/index.html build/web/
           cp web/styles.css build/web/
           cp web/script.js build/web/
