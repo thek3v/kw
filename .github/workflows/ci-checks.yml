@@ -5,10 +5,6 @@ on:
     branches:
       - develop
       - main
-  push:
-    branches:
-      - develop
-      - main
 
 jobs:
   validate-static-web:
@@ -37,7 +33,7 @@ jobs:
         run: |
           test -f .github/workflows/ci-checks.yml
           test -f .github/workflows/integration.yml
-          test -f .github/workflows/deploy-dev.yml
+          test -f .github/workflows/deploy.yml
 
       - name: Check forbidden files
         run: |

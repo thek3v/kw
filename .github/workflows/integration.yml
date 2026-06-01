@@ -1,4 +1,6 @@
-name: Integration Build
+name: Integration
+
+run-name: ${{ github.event.head_commit.message }}
 
 on:
   push:
@@ -7,52 +9,72 @@ on:
 
 jobs:
   build-snapshot:
-    name: Build snapshot artifact
+    name: Build DEV snapshot artifact
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Read version
-        id: version
+      - name: Read version and build metadata
+        id: meta
         run: |
           VERSION=$(cat VERSION)
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          BUILD_TS=$(date -u +"%Y%m%d_%H%M")
+          ARTIFACT_NAME="kw-web-${VERSION}-${BUILD_TS}-${SHORT_SHA}"
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "build_ts=$BUILD_TS" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Validate snapshot version
         run: |
-          VERSION=$(cat VERSION)
+          VERSION="${{ steps.meta.outputs.version }}"
           if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
-            echo "Develop builds must use a SNAPSHOT version"
+            echo "Integration builds must use a SNAPSHOT version"
             exit 1
           fi
 
       - name: Create build metadata
         run: |
-          echo "${{ steps.version.outputs.version }}" > BUILD_VERSION
+          echo "${{ steps.meta.outputs.version }}" > BUILD_VERSION
           echo "${{ github.sha }}" > BUILD_COMMIT
           echo "${{ github.ref_name }}" > BUILD_BRANCH
           echo "SNAPSHOT" > BUILD_TYPE
+          echo "${{ steps.meta.outputs.short_sha }}" > BUILD_SHORT_SHA
+          echo "${{ steps.meta.outputs.build_ts }}" > BUILD_TIMESTAMP
+          echo "${{ steps.meta.outputs.artifact_name }}" > ARTIFACT_NAME
           date -u +"%Y-%m-%dT%H:%M:%SZ" > BUILD_DATE
 
-      - name: Prepare artifact
+      - name: Prepare DEV snapshot artifact
         run: |
           mkdir -p build/web
+
           cp web/index.html build/web/
           cp web/styles.css build/web/
           cp web/script.js build/web/
           cp -r web/assets build/web/
+
           cp README.md build/
           cp VERSION build/
           cp BUILD_VERSION build/
           cp BUILD_COMMIT build/
           cp BUILD_BRANCH build/
           cp BUILD_TYPE build/
+          cp BUILD_SHORT_SHA build/
+          cp BUILD_TIMESTAMP build/
           cp BUILD_DATE build/
+          cp ARTIFACT_NAME build/
 
-      - name: Upload snapshot artifact
+      - name: Show artifact name
+        run: |
+          echo "Artifact generated:"
+          echo "${{ steps.meta.outputs.artifact_name }}"
+
+      - name: Upload DEV snapshot artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kw-web-${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: ${{ steps.meta.outputs.artifact_name }}
           path: build/

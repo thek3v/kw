@@ -1,0 +1,128 @@
+name: Deploy
+
+run-name: >-
+  Deployment: ${{ inputs.artifact_name }} to
+  ${{ inputs.environment == 'dev' && 'certification development environment' || inputs.environment == 'pre' && 'pre-production environment' || 'production environment' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - pre
+          - prod
+
+      artifact_name:
+        description: "Artifact name to deploy"
+        required: true
+        type: string
+
+      source_run_id:
+        description: "Run ID of the Integration workflow that produced the artifact"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy selected artifact
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Show deployment inputs
+        run: |
+          echo "::group::Deployment inputs"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Artifact name: ${{ inputs.artifact_name }}"
+          echo "Source run ID: ${{ inputs.source_run_id }}"
+          echo "::endgroup::"
+
+      - name: Validate deployment policy
+        run: |
+          ENV="${{ inputs.environment }}"
+          ARTIFACT="${{ inputs.artifact_name }}"
+
+          if [[ "$ENV" == "dev" || "$ENV" == "pre" ]]; then
+            if [[ "$ARTIFACT" != *SNAPSHOT* ]]; then
+              echo "::error::DEV/PRE only accept SNAPSHOT artifacts"
+              exit 1
+            fi
+          fi
+
+          if [[ "$ENV" == "prod" ]]; then
+            if [[ "$ARTIFACT" == *SNAPSHOT* ]]; then
+              echo "::error::PROD does not accept SNAPSHOT artifacts"
+              exit 1
+            fi
+          fi
+
+      - name: Download selected artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: downloaded
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Inspect downloaded artifact
+        run: |
+          echo "::group::Downloaded artifact"
+          find downloaded -maxdepth 4 -type f | sort
+          echo "::endgroup::"
+
+      - name: Validate downloaded artifact
+        run: |
+          test -f downloaded/VERSION
+          test -f downloaded/ARTIFACT_NAME
+          test -f downloaded/web/index.html
+          test -f downloaded/web/styles.css
+          test -f downloaded/web/script.js
+          test -d downloaded/web/assets
+
+      - name: Prepare GitHub Pages site
+        if: ${{ inputs.environment == 'dev' }}
+        run: |
+          mkdir -p site
+
+          cp downloaded/web/index.html site/
+          cp downloaded/web/styles.css site/
+          cp downloaded/web/script.js site/
+          cp -r downloaded/web/assets site/
+          cp downloaded/VERSION site/
+
+          echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
+          echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
+          echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
+
+          if [ -f downloaded/BUILD_COMMIT ]; then
+            echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+          if [ -f downloaded/BUILD_DATE ]; then
+            echo "Build date: $(cat downloaded/BUILD_DATE)" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+      - name: Configure GitHub Pages
+        if: ${{ inputs.environment == 'dev' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: ${{ inputs.environment == 'dev' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        if: ${{ inputs.environment == 'dev' }}
+        uses: actions/deploy-pages@v4
