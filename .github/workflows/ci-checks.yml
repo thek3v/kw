@@ -3,12 +3,12 @@ name: CI Checks
 on:
   pull_request:
     branches:
-      - develop
       - main
+      - develop
   push:
     branches:
-      - develop
       - main
+      - develop
 
 jobs:
   validate-static-web:

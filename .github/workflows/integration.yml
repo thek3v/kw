@@ -1,19 +1,30 @@
 name: Integration Build
 
 on:
-  push:
-    branches:
-      - main
-      - develop
+  workflow_run:
+    workflows:
+      - CI Checks
+    types:
+      - completed
 
 jobs:
   build-snapshot:
-    name: Build snapshot artifact
+    name: Build DEV snapshot artifact
     runs-on: ubuntu-latest
+
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      (
+        github.event.workflow_run.head_branch == 'main' ||
+        github.event.workflow_run.head_branch == 'develop'
+      )
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Read version
         id: version
@@ -31,29 +42,35 @@ jobs:
 
       - name: Create build metadata
         run: |
+          SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+
           echo "${{ steps.version.outputs.version }}" > BUILD_VERSION
-          echo "${{ github.sha }}" > BUILD_COMMIT
-          echo "${{ github.ref_name }}" > BUILD_BRANCH
+          echo "${{ github.event.workflow_run.head_sha }}" > BUILD_COMMIT
+          echo "${{ github.event.workflow_run.head_branch }}" > BUILD_BRANCH
           echo "SNAPSHOT" > BUILD_TYPE
+          echo "$SHORT_SHA" > BUILD_SHORT_SHA
           date -u +"%Y-%m-%dT%H:%M:%SZ" > BUILD_DATE
 
-      - name: Prepare artifact
+      - name: Prepare DEV snapshot artifact
         run: |
           mkdir -p build/web
+
           cp web/index.html build/web/
           cp web/styles.css build/web/
           cp web/script.js build/web/
           cp -r web/assets build/web/
+
           cp README.md build/
           cp VERSION build/
           cp BUILD_VERSION build/
           cp BUILD_COMMIT build/
           cp BUILD_BRANCH build/
           cp BUILD_TYPE build/
+          cp BUILD_SHORT_SHA build/
           cp BUILD_DATE build/
 
-      - name: Upload snapshot artifact
+      - name: Upload DEV snapshot artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kw-web-${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: deployment-dev-snapshot-${{ steps.version.outputs.version }}-${{ github.run_number }}
           path: build/

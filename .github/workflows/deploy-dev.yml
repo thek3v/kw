@@ -1,16 +1,24 @@
 name: Deploy DEV
 
 on:
+  workflow_run:
+    workflows:
+      - Integration Build
+    types:
+      - completed
+
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - develop
+    inputs:
+      source_run_id:
+        description: "Run ID del workflow Integration Build que generó el artifact"
+        required: false
+        type: string
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: pages-dev
@@ -18,44 +26,91 @@ concurrency:
 
 jobs:
   deploy-dev:
-    name: Deploy web to DEV
+    name: Deployment DEV from snapshot
     runs-on: ubuntu-latest
+
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        (
+          github.event.workflow_run.head_branch == 'main' ||
+          github.event.workflow_run.head_branch == 'develop'
+        )
+      )
 
     environment:
       name: dev
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate project before deploy
+      - name: Resolve source run id
+        id: source
         run: |
-          test -f VERSION
-          test -f web/index.html
-          test -f web/styles.css
-          test -f web/script.js
-          test -d web/assets
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_id=${{ inputs.source_run_id }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate source run id
+        run: |
+          if [ -z "${{ steps.source.outputs.run_id }}" ]; then
+            echo "source_run_id is required when running this workflow manually"
+            exit 1
+          fi
+
+      - name: Download DEV snapshot artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ steps.source.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: deployment-dev-snapshot-*
+          path: downloaded
+          merge-multiple: true
+
+      - name: Validate downloaded artifact
+        run: |
+          test -f downloaded/VERSION
+          test -f downloaded/web/index.html
+          test -f downloaded/web/styles.css
+          test -f downloaded/web/script.js
+          test -d downloaded/web/assets
 
       - name: Validate DEV uses snapshot version
         run: |
-          VERSION=$(cat VERSION)
+          VERSION=$(cat downloaded/VERSION)
           if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
             echo "DEV deploys must use a SNAPSHOT version"
             exit 1
           fi
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Prepare site
+      - name: Create deployment metadata
         run: |
           mkdir -p site
-          cp web/index.html site/
-          cp web/styles.css site/
-          cp web/script.js site/
-          cp -r web/assets site/
-          cp VERSION site/
+
+          cp downloaded/web/index.html site/
+          cp downloaded/web/styles.css site/
+          cp downloaded/web/script.js site/
+          cp -r downloaded/web/assets site/
+          cp downloaded/VERSION site/
+
+          echo "Deployment DEV" > site/DEPLOYMENT_NAME.txt
+          echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
+          echo "Artifact type: SNAPSHOT" >> site/DEPLOYMENT_INFO.txt
+          echo "Version: $(cat downloaded/VERSION)" >> site/DEPLOYMENT_INFO.txt
+          echo "Source run id: ${{ steps.source.outputs.run_id }}" >> site/DEPLOYMENT_INFO.txt
+
+          if [ -f downloaded/BUILD_COMMIT ]; then
+            echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+          if [ -f downloaded/BUILD_DATE ]; then
+            echo "Build date: $(cat downloaded/BUILD_DATE)" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
