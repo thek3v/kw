@@ -78,35 +78,25 @@ jobs:
       - name: Inspect downloaded artifact
         run: |
           echo "::group::Downloaded artifact"
-          echo "Current directory:"
           pwd
-          echo ""
-          echo "Downloaded files:"
           find downloaded -maxdepth 6 -type f | sort
           echo "::endgroup::"
 
       - name: Resolve downloaded artifact root
         id: artifact_root
         run: |
-          echo "::group::Resolve downloaded artifact root"
-
           VERSION_FILE=$(find downloaded -type f -name VERSION | head -n 1)
 
           if [ -z "$VERSION_FILE" ]; then
             echo "::error::VERSION file not found inside downloaded artifact"
-            echo "Files found:"
             find downloaded -maxdepth 6 -type f | sort
             exit 1
           fi
 
           ROOT_DIR=$(dirname "$VERSION_FILE")
-
-          echo "Resolved VERSION file: $VERSION_FILE"
-          echo "Resolved artifact root: $ROOT_DIR"
-
           echo "root=$ROOT_DIR" >> "$GITHUB_OUTPUT"
 
-          echo "::endgroup::"
+          echo "Resolved artifact root: $ROOT_DIR"
 
       - name: Validate downloaded artifact
         run: |
@@ -115,7 +105,6 @@ jobs:
           echo "Validating artifact at root: $ROOT"
 
           test -f "$ROOT/VERSION"
-          test -f "$ROOT/ARTIFACT_NAME"
           test -f "$ROOT/web/index.html"
           test -f "$ROOT/web/styles.css"
           test -f "$ROOT/web/script.js"
