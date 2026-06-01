@@ -1,5 +1,7 @@
 name: Deploy DEV
 
+run-name: Deployment DEV - snapshot
+
 on:
   workflow_run:
     workflows:
@@ -10,8 +12,8 @@ on:
   workflow_dispatch:
     inputs:
       source_run_id:
-        description: "Run ID del workflow Integration Build que generó el artifact"
-        required: false
+        description: "Run ID del workflow Integration Build que generó el snapshot"
+        required: true
         type: string
 
 permissions:
@@ -53,12 +55,10 @@ jobs:
             echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Validate source run id
+      - name: Show source run id
         run: |
-          if [ -z "${{ steps.source.outputs.run_id }}" ]; then
-            echo "source_run_id is required when running this workflow manually"
-            exit 1
-          fi
+          echo "Using Integration Build run id:"
+          echo "${{ steps.source.outputs.run_id }}"
 
       - name: Download DEV snapshot artifact
         uses: actions/download-artifact@v4
@@ -69,9 +69,18 @@ jobs:
           path: downloaded
           merge-multiple: true
 
+      - name: Show downloaded artifact content
+        run: |
+          echo "Downloaded content:"
+          find downloaded -maxdepth 4 -type f | sort
+
       - name: Validate downloaded artifact
         run: |
           test -f downloaded/VERSION
+          test -f downloaded/ARTIFACT_NAME
+          test -f downloaded/BUILD_VERSION
+          test -f downloaded/BUILD_COMMIT
+          test -f downloaded/BUILD_TIMESTAMP
           test -f downloaded/web/index.html
           test -f downloaded/web/styles.css
           test -f downloaded/web/script.js
@@ -85,7 +94,7 @@ jobs:
             exit 1
           fi
 
-      - name: Create deployment metadata
+      - name: Prepare GitHub Pages site
         run: |
           mkdir -p site
 
@@ -97,17 +106,11 @@ jobs:
 
           echo "Deployment DEV" > site/DEPLOYMENT_NAME.txt
           echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
-          echo "Artifact type: SNAPSHOT" >> site/DEPLOYMENT_INFO.txt
+          echo "Artifact: $(cat downloaded/ARTIFACT_NAME)" >> site/DEPLOYMENT_INFO.txt
           echo "Version: $(cat downloaded/VERSION)" >> site/DEPLOYMENT_INFO.txt
-          echo "Source run id: ${{ steps.source.outputs.run_id }}" >> site/DEPLOYMENT_INFO.txt
-
-          if [ -f downloaded/BUILD_COMMIT ]; then
-            echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
-          fi
-
-          if [ -f downloaded/BUILD_DATE ]; then
-            echo "Build date: $(cat downloaded/BUILD_DATE)" >> site/DEPLOYMENT_INFO.txt
-          fi
+          echo "Snapshot timestamp: $(cat downloaded/BUILD_TIMESTAMP)" >> site/DEPLOYMENT_INFO.txt
+          echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
+          echo "Source Integration run id: ${{ steps.source.outputs.run_id }}" >> site/DEPLOYMENT_INFO.txt
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
