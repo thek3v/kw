@@ -136,7 +136,7 @@ jobs:
 
           echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
           echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
-          echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt"
+          echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
 
           if [ -f "$ROOT/BUILD_COMMIT" ]; then
             echo "Commit: $(cat "$ROOT/BUILD_COMMIT")" >> site/DEPLOYMENT_INFO.txt
