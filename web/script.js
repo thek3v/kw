@@ -14,6 +14,7 @@ function showPage(pageId) {
 
   if (selectedPage) {
     selectedPage.classList.add("active-page");
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -55,7 +56,7 @@ window.addEventListener("popstate", () => {
 // =========================
 
 const animatedElements = document.querySelectorAll(
-  "section, article, .hero-card, .process-grid div"
+  "section, article, .hero-card, .process-grid div, .impact-grid div, .mission-grid div, .method-note"
 );
 
 const observer = new IntersectionObserver(
