@@ -47,7 +47,7 @@ jobs:
           echo "Environment: ${{ inputs.environment }}"
           echo "Artifact name: ${{ inputs.artifact_name }}"
           echo "Source run ID: ${{ inputs.source_run_id }}"
-          echo "Target URL: https://thek3v.github.io/kw/"
+          echo "Expected DEV URL: https://thek3v.github.io/kw/"
           echo "::endgroup::"
 
       - name: Validate deployment policy
@@ -69,14 +69,25 @@ jobs:
             fi
           fi
 
+      - name: List artifacts from source run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Artifacts available in source run"
+          gh api repos/${{ github.repository }}/actions/runs/${{ inputs.source_run_id }}/artifacts \
+            --jq '.artifacts[] | "- " + .name'
+          echo "::endgroup::"
+
       - name: Download selected artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: downloaded
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ inputs.source_run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p downloaded
+
+          gh run download "${{ inputs.source_run_id }}" \
+            --repo "${{ github.repository }}" \
+            --name "${{ inputs.artifact_name }}" \
+            --dir downloaded
 
       - name: Inspect downloaded artifact
         run: |
