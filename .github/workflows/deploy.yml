@@ -36,7 +36,9 @@ jobs:
   deploy:
     name: Deploy selected artifact
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Show deployment inputs
@@ -45,6 +47,7 @@ jobs:
           echo "Environment: ${{ inputs.environment }}"
           echo "Artifact name: ${{ inputs.artifact_name }}"
           echo "Source run ID: ${{ inputs.source_run_id }}"
+          echo "Target URL: https://thek3v.github.io/kw/"
           echo "::endgroup::"
 
       - name: Validate deployment policy
@@ -157,6 +160,7 @@ jobs:
           fi
 
           echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
+          echo "Deployment URL: https://thek3v.github.io/kw/" >> site/DEPLOYMENT_INFO.txt
           echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
           echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
 
@@ -188,4 +192,11 @@ jobs:
 
       - name: Deploy to GitHub Pages
         if: ${{ inputs.environment == 'dev' }}
+        id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Show deployment URL
+        if: ${{ inputs.environment == 'dev' }}
+        run: |
+          echo "::notice::Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"
