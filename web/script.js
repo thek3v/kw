@@ -52,11 +52,25 @@ window.addEventListener("popstate", () => {
 });
 
 // =========================
+// FAQ
+// =========================
+
+const faqItems = document.querySelectorAll(".faq-item");
+
+faqItems.forEach((item) => {
+  const question = item.querySelector(".faq-question");
+
+  question.addEventListener("click", () => {
+    item.classList.toggle("active");
+  });
+});
+
+// =========================
 // ANIMACIONES AL HACER SCROLL
 // =========================
 
 const animatedElements = document.querySelectorAll(
-  "section, article, .hero-card, .process-grid div, .impact-grid div, .mission-grid div, .method-note"
+  "article, .impact-grid div, .mission-grid div, .method-note, .faq-item, .roadmap-step, .roadmap-content"
 );
 
 const observer = new IntersectionObserver(
@@ -73,6 +87,8 @@ const observer = new IntersectionObserver(
 );
 
 animatedElements.forEach((element) => {
-  element.classList.add("fade-in");
-  observer.observe(element);
+  if (!element.classList.contains("no-fade")) {
+    element.classList.add("fade-in");
+    observer.observe(element);
+  }
 });
