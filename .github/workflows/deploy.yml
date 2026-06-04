@@ -36,7 +36,9 @@ jobs:
   deploy:
     name: Deploy selected artifact
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Show deployment inputs
@@ -45,6 +47,7 @@ jobs:
           echo "Environment: ${{ inputs.environment }}"
           echo "Artifact name: ${{ inputs.artifact_name }}"
           echo "Source run ID: ${{ inputs.source_run_id }}"
+          echo "Expected DEV URL: https://thek3v.github.io/kw/"
           echo "::endgroup::"
 
       - name: Validate deployment policy
@@ -66,52 +69,127 @@ jobs:
             fi
           fi
 
+      - name: List artifacts from source run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Artifacts available in source run"
+          gh api repos/${{ github.repository }}/actions/runs/${{ inputs.source_run_id }}/artifacts \
+            --jq '.artifacts[] | "- " + .name'
+          echo "::endgroup::"
+
       - name: Download selected artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: downloaded
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ inputs.source_run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p downloaded
+
+          gh run download "${{ inputs.source_run_id }}" \
+            --repo "${{ github.repository }}" \
+            --name "${{ inputs.artifact_name }}" \
+            --dir downloaded
 
       - name: Inspect downloaded artifact
         run: |
           echo "::group::Downloaded artifact"
-          find downloaded -maxdepth 4 -type f | sort
+          pwd
+          echo ""
+          echo "Directories:"
+          find downloaded -maxdepth 4 -type d | sort
+          echo ""
+          echo "Files:"
+          find downloaded -maxdepth 6 -type f | sort
           echo "::endgroup::"
 
-      - name: Validate downloaded artifact
+      - name: Resolve artifact paths
+        id: paths
         run: |
-          test -f downloaded/VERSION
-          test -f downloaded/ARTIFACT_NAME
-          test -f downloaded/web/index.html
-          test -f downloaded/web/styles.css
-          test -f downloaded/web/script.js
-          test -d downloaded/web/assets
+          echo "::group::Resolve artifact paths"
+
+          VERSION_FILE=$(find downloaded -type f -name VERSION | head -n 1)
+
+          if [ -z "$VERSION_FILE" ]; then
+            echo "::error::VERSION file not found inside downloaded artifact"
+            find downloaded -maxdepth 6 -type f | sort
+            exit 1
+          fi
+
+          ARTIFACT_ROOT=$(dirname "$VERSION_FILE")
+
+          if [ -f "$ARTIFACT_ROOT/web/index.html" ]; then
+            WEB_ROOT="$ARTIFACT_ROOT/web"
+          else
+            INDEX_FILE=$(find downloaded -type f -name index.html | head -n 1)
+
+            if [ -z "$INDEX_FILE" ]; then
+              echo "::error::index.html not found inside downloaded artifact"
+              find downloaded -maxdepth 6 -type f | sort
+              exit 1
+            fi
+
+            WEB_ROOT=$(dirname "$INDEX_FILE")
+          fi
+
+          echo "Artifact root: $ARTIFACT_ROOT"
+          echo "Web root: $WEB_ROOT"
+
+          echo "artifact_root=$ARTIFACT_ROOT" >> "$GITHUB_OUTPUT"
+          echo "web_root=$WEB_ROOT" >> "$GITHUB_OUTPUT"
+
+          echo "::endgroup::"
+
+      - name: Validate downloaded web files
+        run: |
+          WEB_ROOT="${{ steps.paths.outputs.web_root }}"
+
+          echo "Validating web files at: $WEB_ROOT"
+
+          test -f "$WEB_ROOT/index.html"
+          test -f "$WEB_ROOT/styles.css"
+          test -f "$WEB_ROOT/script.js"
+
+          if [ ! -d "$WEB_ROOT/assets" ]; then
+            echo "assets directory not found. Creating empty assets directory."
+            mkdir -p "$WEB_ROOT/assets"
+          fi
 
       - name: Prepare GitHub Pages site
         if: ${{ inputs.environment == 'dev' }}
         run: |
+          ARTIFACT_ROOT="${{ steps.paths.outputs.artifact_root }}"
+          WEB_ROOT="${{ steps.paths.outputs.web_root }}"
+
           mkdir -p site
 
-          cp downloaded/web/index.html site/
-          cp downloaded/web/styles.css site/
-          cp downloaded/web/script.js site/
-          cp -r downloaded/web/assets site/
-          cp downloaded/VERSION site/
+          cp "$WEB_ROOT/index.html" site/
+          cp "$WEB_ROOT/styles.css" site/
+          cp "$WEB_ROOT/script.js" site/
+          cp -r "$WEB_ROOT/assets" site/
+
+          if [ -f "$ARTIFACT_ROOT/VERSION" ]; then
+            cp "$ARTIFACT_ROOT/VERSION" site/
+          fi
 
           echo "Environment: DEV" > site/DEPLOYMENT_INFO.txt
+          echo "Deployment URL: https://thek3v.github.io/kw/" >> site/DEPLOYMENT_INFO.txt
           echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
           echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
 
-          if [ -f downloaded/BUILD_COMMIT ]; then
-            echo "Commit: $(cat downloaded/BUILD_COMMIT)" >> site/DEPLOYMENT_INFO.txt
+          if [ -f "$ARTIFACT_ROOT/BUILD_COMMIT" ]; then
+            echo "Commit: $(cat "$ARTIFACT_ROOT/BUILD_COMMIT")" >> site/DEPLOYMENT_INFO.txt
           fi
 
-          if [ -f downloaded/BUILD_DATE ]; then
-            echo "Build date: $(cat downloaded/BUILD_DATE)" >> site/DEPLOYMENT_INFO.txt
+          if [ -f "$ARTIFACT_ROOT/BUILD_DATE" ]; then
+            echo "Build date: $(cat "$ARTIFACT_ROOT/BUILD_DATE")" >> site/DEPLOYMENT_INFO.txt
           fi
+
+          if [ -f "$ARTIFACT_ROOT/BUILD_TIMESTAMP" ]; then
+            echo "Build timestamp: $(cat "$ARTIFACT_ROOT/BUILD_TIMESTAMP")" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+          echo ""
+          echo "Final site content:"
+          find site -maxdepth 4 -type f | sort
 
       - name: Configure GitHub Pages
         if: ${{ inputs.environment == 'dev' }}
@@ -125,4 +203,11 @@ jobs:
 
       - name: Deploy to GitHub Pages
         if: ${{ inputs.environment == 'dev' }}
+        id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Show deployment URL
+        if: ${{ inputs.environment == 'dev' }}
+        run: |
+          echo "::notice::Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"

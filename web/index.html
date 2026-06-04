@@ -6,7 +6,10 @@
 
   <title>KW | Automatización, Datos e IA para empresas</title>
 
-  <meta name="description" content="Ayudamos a empresas a automatizar procesos, ordenar sus datos y aplicar inteligencia artificial cuando aporta valor real." />
+  <meta
+    name="description"
+    content="KW transforma procesos operativos en sistemas digitales más eficientes, integrados y preparados para escalar."
+  />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -14,64 +17,214 @@
 
   <header>
     <nav>
-      <a class="logo" href="#inicio">KW</a>
+      <a class="logo" href="#inicio" data-page="inicio">KW</a>
 
-      <ul>
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#proceso">Proceso</a></li>
-        <li><a href="#nosotros">Quiénes somos</a></li>
-        <li><a href="#contacto">Contacto</a></li>
+      <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-menu">
+        <li><a href="#inicio" data-page="inicio">Inicio</a></li>
+        <li><a href="#servicios" data-page="servicios">Servicios</a></li>
+        <li><a href="#proceso" data-page="proceso">Proceso</a></li>
+        <li><a href="#nosotros" data-page="nosotros">Quiénes somos</a></li>
+        <li><a href="#contacto" data-page="contacto">Contacto</a></li>
       </ul>
     </nav>
   </header>
 
   <main>
 
-    <section id="inicio" class="hero">
-      <div class="hero-content">
-        <span class="eyebrow">Automatización · Datos · IA aplicada</span>
+    <!-- INICIO -->
+    <section id="inicio" class="page active-page">
+      <div class="hero hero-centered no-fade">
+        <div class="hero-content">
+          <span class="eyebrow">Automatización · Ingeniería de datos · IA aplicada</span>
 
-        <h1>
-          Transformamos tareas repetitivas en procesos inteligentes.
-        </h1>
+          <h1>
+            <span class="brand-title">KW</span>
+            <span class="hero-title-text">Transformamos procesos operativos en sistemas digitales más eficientes, integrados y preparados para escalar.</span>
+          </h1>
 
-        <p>
-          Ayudamos a empresas a ahorrar tiempo, reducir errores operativos y ordenar sus datos
-          mediante automatización, reporting e inteligencia artificial aplicada al negocio.
-        </p>
+          <p>
+            Analizamos cómo trabaja tu empresa, detectamos oportunidades de mejora y construimos soluciones
+            digitales que reducen carga manual, ordenan datos críticos y facilitan decisiones más rápidas y fiables.
+          </p>
 
-        <div class="hero-actions">
-          <a class="btn-primary" href="#contacto">Habla con nosotros</a>
-          <a class="btn-secondary" href="#servicios">Ver servicios</a>
+          <div class="hero-actions">
+            <a class="btn-primary" href="#contacto" data-page="contacto">Solicitar análisis inicial sin coste</a>
+            <a class="btn-secondary" href="#servicios" data-page="servicios">Ver servicios</a>
+          </div>
+        </div>
+
+        <div class="hero-card hero-card-horizontal no-fade">
+          <p class="card-label">De la operación al valor</p>
+
+          <div class="flow-horizontal">
+            <div class="flow-step">Proceso manual</div>
+            <div class="flow-line"></div>
+            <div class="flow-step">Datos dispersos</div>
+            <div class="flow-line"></div>
+            <div class="flow-step">Sistema automatizado</div>
+            <div class="flow-line"></div>
+            <div class="flow-step active">Decisión inteligente</div>
+          </div>
         </div>
       </div>
 
-      <div class="hero-card">
-        <p class="card-label">Dónde aportamos valor</p>
+      <div class="trust-strip no-fade">
+        <span>Análisis inicial sin coste</span>
+        <span>Soluciones a medida</span>
+        <span>Integración con herramientas existentes</span>
+        <span>Mantenimiento posterior</span>
+      </div>
 
-        <div class="flow-step">Procesos manuales</div>
-        <div class="flow-line"></div>
-        <div class="flow-step">Datos dispersos</div>
-        <div class="flow-line"></div>
-        <div class="flow-step">Automatización</div>
-        <div class="flow-line"></div>
-        <div class="flow-step active">IA aplicada</div>
+      <div class="home-summary home-summary-spaced">
+        <article>
+          <span class="service-number">01</span>
+          <h3>Problema</h3>
+          <p>Procesos manuales, datos dispersos, informes lentos y tareas repetitivas que limitan la eficiencia.</p>
+        </article>
+
+        <article>
+          <span class="service-number">02</span>
+          <h3>Solución</h3>
+          <p>Automatización, ingeniería de datos e inteligencia artificial aplicadas con criterio empresarial.</p>
+        </article>
+
+        <article>
+          <span class="service-number">03</span>
+          <h3>Resultado</h3>
+          <p>Menos errores, mayor control operativo y datos preparados para tomar mejores decisiones.</p>
+        </article>
+      </div>
+
+      <div class="premium-block">
+        <span class="section-tag">Problemas que resolvemos</span>
+
+        <h2>Muchas empresas no necesitan más herramientas. Necesitan mejores sistemas.</h2>
+
+        <p>
+          En KW nos enfocamos en los puntos donde la operación pierde eficiencia:
+          tareas repetitivas, información poco conectada, procesos lentos, errores manuales
+          y falta de visibilidad sobre los datos.
+        </p>
+
+        <div class="challenge-grid">
+          <article>
+            <h3>Procesos manuales</h3>
+            <p>Tareas repetidas que consumen tiempo y podrían ejecutarse de forma automática.</p>
+          </article>
+
+          <article>
+            <h3>Datos dispersos</h3>
+            <p>Información repartida en Excels, sistemas internos, correos o herramientas desconectadas.</p>
+          </article>
+
+          <article>
+            <h3>Reportes lentos</h3>
+            <p>Informes que requieren demasiado trabajo manual antes de llegar a dirección.</p>
+          </article>
+
+          <article>
+            <h3>Errores operativos</h3>
+            <p>Fallos derivados de copiar, pegar, revisar o transformar información manualmente.</p>
+          </article>
+
+          <article>
+            <h3>Baja trazabilidad</h3>
+            <p>Procesos difíciles de auditar porque no existe un flujo claro y controlado.</p>
+          </article>
+
+          <article>
+            <h3>Decisiones sin visibilidad</h3>
+            <p>Equipos que deciden tarde porque no tienen datos preparados, actualizados o centralizados.</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="premium-block">
+        <span class="section-tag">Por qué KW</span>
+
+        <h2>Tecnología aplicada con criterio empresarial.</h2>
+
+        <p>
+          Nuestro trabajo no consiste en añadir complejidad, sino en construir soluciones claras,
+          útiles y sostenibles que ayuden a la empresa a operar mejor.
+        </p>
+
+        <div class="value-grid">
+          <article>
+            <h3>Orientación al negocio</h3>
+            <p>Cada solución debe responder a una necesidad real y tener impacto operativo medible.</p>
+          </article>
+
+          <article>
+            <h3>Rigor técnico</h3>
+            <p>Trabajamos con criterios de ingeniería, datos, automatización, cloud y despliegue controlado.</p>
+          </article>
+
+          <article>
+            <h3>Soluciones integradas</h3>
+            <p>Diseñamos mejoras que puedan convivir con las herramientas y tecnologías existentes.</p>
+          </article>
+
+          <article>
+            <h3>Mantenimiento</h3>
+            <p>Acompañamos después del despliegue para mantener, adaptar y evolucionar la solución.</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="impact-section">
+        <span class="section-tag">Impacto</span>
+
+        <h2>Qué buscamos conseguir en cada proyecto.</h2>
+
+        <div class="impact-grid">
+          <div>
+            <strong>Ahorrar tiempo operativo</strong>
+            <p>Reducir tareas repetitivas para que el equipo pueda centrarse en trabajo de mayor valor.</p>
+          </div>
+
+          <div>
+            <strong>Reducir errores</strong>
+            <p>Minimizar fallos humanos mediante procesos automatizados, controlados y trazables.</p>
+          </div>
+
+          <div>
+            <strong>Centralizar información</strong>
+            <p>Organizar datos clave para que estén disponibles, actualizados y preparados para su uso.</p>
+          </div>
+
+          <div>
+            <strong>Mejorar decisiones</strong>
+            <p>Convertir datos en reporting, indicadores, alertas o sistemas inteligentes de apoyo.</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="servicios">
+    <!-- SERVICIOS -->
+    <section id="servicios" class="page">
       <span class="section-tag">Qué hacemos</span>
 
-      <h2>Soluciones para empresas que quieren dejar de depender de procesos manuales.</h2>
+      <h2>Soluciones para empresas que quieren operar con más eficiencia.</h2>
+
+      <p>
+        En KW ayudamos a transformar procesos manuales, datos desordenados y tareas repetitivas
+        en soluciones digitales que aportan valor real.
+      </p>
 
       <div class="services-grid">
         <article>
           <span class="service-number">01</span>
           <h3>Automatización de tareas</h3>
           <p>
-            Automatizamos tareas repetitivas como generación de informes, consolidación de Excels,
-            revisión de datos, alertas internas o envío de reportes periódicos.
+            Automatizamos generación de informes, consolidación de Excels, revisión de datos,
+            envío de reportes, alertas internas y procesos administrativos.
           </p>
         </article>
 
@@ -79,85 +232,388 @@
           <span class="service-number">02</span>
           <h3>Datos y reporting</h3>
           <p>
-            Conectamos fuentes de datos, ordenamos información dispersa y construimos dashboards
-            claros para que la empresa pueda decidir con datos actualizados.
+            Ordenamos información dispersa, conectamos fuentes de datos y construimos dashboards
+            claros para tomar decisiones con información actualizada.
           </p>
         </article>
 
         <article>
           <span class="service-number">03</span>
-          <h3>IA útil para negocio</h3>
+          <h3>IA aplicada al negocio</h3>
           <p>
-            Aplicamos inteligencia artificial en casos concretos: análisis documental, asistentes internos,
-            clasificación de información, predicciones o apoyo a decisiones.
+            Aplicamos IA en casos concretos: análisis documental, asistentes internos,
+            clasificación de información, predicciones y apoyo a decisiones.
+          </p>
+        </article>
+
+        <article>
+          <span class="service-number">04</span>
+          <h3>Optimización de procesos</h3>
+          <p>
+            Analizamos flujos de trabajo y detectamos puntos donde se puede reducir tiempo,
+            errores, duplicidades o dependencia manual.
+          </p>
+        </article>
+
+        <article>
+          <span class="service-number">05</span>
+          <h3>Herramientas internas</h3>
+          <p>
+            Creamos paneles, formularios, sistemas de control, automatizaciones y soluciones
+            internas adaptadas al día a día de la empresa.
+          </p>
+        </article>
+
+        <article>
+          <span class="service-number">06</span>
+          <h3>Mantenimiento y evolución</h3>
+          <p>
+            Acompañamos después del despliegue para mantener, mejorar y ampliar las soluciones según las necesidades del negocio.
           </p>
         </article>
       </div>
-    </section>
 
-    <section id="proceso">
-      <span class="section-tag">Cómo trabajamos</span>
+      <div class="use-cases">
+        <span class="section-tag">Casos de uso</span>
 
-      <h2>No empezamos por la tecnología. Empezamos por entender el problema.</h2>
+        <h2>Aplicaciones reales para distintos equipos y áreas de negocio.</h2>
 
-      <div class="process-grid">
-        <div>
-          <h3>1. Escuchamos</h3>
-          <p>
-            Analizamos cómo trabaja la empresa, qué tareas consumen tiempo y dónde aparecen errores o bloqueos.
-          </p>
+        <div class="case-grid">
+          <article>
+            <h3>Dirección</h3>
+            <p>Dashboards ejecutivos, seguimiento de KPIs y reporting automatizado para tener visión global del negocio.</p>
+          </article>
+
+          <article>
+            <h3>Operaciones</h3>
+            <p>Automatización de tareas repetitivas, control de procesos y reducción de errores operativos.</p>
+          </article>
+
+          <article>
+            <h3>Finanzas</h3>
+            <p>Validación de datos, conciliaciones, estructuración de información y reportes internos.</p>
+          </article>
+
+          <article>
+            <h3>Comercial</h3>
+            <p>Segmentación de clientes, análisis de oportunidades y automatización de seguimiento comercial.</p>
+          </article>
+
+          <article>
+            <h3>Documentación</h3>
+            <p>Clasificación, extracción y análisis de documentos mediante IA y procesamiento del lenguaje.</p>
+          </article>
+
+          <article>
+            <h3>Datos corporativos</h3>
+            <p>Integración de fuentes, preparación de datos y construcción de flujos fiables para análisis posterior.</p>
+          </article>
         </div>
+      </div>
 
-        <div>
-          <h3>2. Detectamos oportunidades</h3>
-          <p>
-            Identificamos procesos que pueden automatizarse o mejorar mediante datos, software o IA aplicada.
-          </p>
-        </div>
+      <div class="tech-block">
+        <span class="section-tag">Tecnologías</span>
 
-        <div>
-          <h3>3. Construimos la solución</h3>
-          <p>
-            Desarrollamos una solución sencilla, mantenible y adaptada al funcionamiento real del negocio.
-          </p>
-        </div>
+        <h2>Trabajamos con herramientas modernas para construir soluciones sólidas.</h2>
 
-        <div>
-          <h3>4. Medimos el impacto</h3>
-          <p>
-            Evaluamos ahorro de tiempo, reducción de errores y mejora operativa para comprobar el valor generado.
-          </p>
+        <div class="tech-tags">
+          <span>Python</span>
+          <span>SQL</span>
+          <span>APIs</span>
+          <span>AWS</span>
+          <span>GitHub Actions</span>
+          <span>Docker</span>
+          <span>Power BI</span>
+          <span>Machine Learning</span>
+          <span>Deep Learning</span>
+          <span>LLMs</span>
+          <span>NLP</span>
+          <span>Data Pipelines</span>
         </div>
       </div>
     </section>
 
-    <section id="nosotros">
-      <span class="section-tag">Quiénes somos</span>
+    <!-- PROCESO -->
+    <section id="proceso" class="page boxed-page">
+      <span class="section-tag">Cómo trabajamos</span>
 
-      <h2>Perfil técnico, visión joven y foco en problemas reales.</h2>
-
-      <p>
-        Somos Kevin y Wilson, dos profesionales tecnológicos con experiencia en datos, automatización
-        e inteligencia artificial aplicada.
-      </p>
+      <h2>Un proceso claro para pasar del problema a una solución desplegada y mantenible.</h2>
 
       <p>
-        Nuestro enfoque es claro: entender primero el problema de la empresa y después construir
-        soluciones útiles, trazables y fáciles de mantener.
+        Evaluamos el caso inicial sin coste, analizamos las herramientas que ya utiliza la empresa
+        y proponemos una solución realista, rápida de entender e integrada con su forma actual de trabajar.
       </p>
+
+      <div class="process-roadmap">
+        <div class="roadmap-step">
+          <div class="roadmap-number">1</div>
+          <div class="roadmap-content">
+            <h3>Diagnóstico inicial sin coste</h3>
+            <p>
+              Revisamos el problema planteado, entendemos el contexto de la empresa y detectamos
+              si existe una oportunidad real de mejora mediante datos, automatización o IA.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-step">
+          <div class="roadmap-number">2</div>
+          <div class="roadmap-content">
+            <h3>Análisis del proceso y herramientas</h3>
+            <p>
+              Estudiamos cómo trabaja actualmente la empresa, qué herramientas utiliza,
+              dónde se generan los datos y qué tareas consumen más tiempo o generan errores.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-step">
+          <div class="roadmap-number">3</div>
+          <div class="roadmap-content">
+            <h3>Propuesta de mejora</h3>
+            <p>
+              Planteamos una solución concreta, viable y adaptada al negocio: automatización,
+              flujo de datos, dashboard, asistente inteligente o integración con sistemas existentes.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-step">
+          <div class="roadmap-number">4</div>
+          <div class="roadmap-content">
+            <h3>Desarrollo controlado</h3>
+            <p>
+              Construimos la solución con criterios de ingeniería, trazabilidad, control de versiones
+              y despliegue ordenado para asegurar estabilidad desde el primer uso.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-step">
+          <div class="roadmap-number">5</div>
+          <div class="roadmap-content">
+            <h3>Validación con casos reales</h3>
+            <p>
+              Probamos la solución con escenarios reales para comprobar que encaja con el proceso operativo
+              y que aporta valor desde el inicio.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-step">
+          <div class="roadmap-number">6</div>
+          <div class="roadmap-content">
+            <h3>Despliegue, mantenimiento y evolución</h3>
+            <p>
+              Desplegamos la solución y ofrecemos mantenimiento posterior para resolver incidencias,
+              incorporar mejoras y adaptar el sistema a nuevas necesidades de la empresa.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="method-note">
+        <h3>Rápidos en el análisis, rigurosos en la solución.</h3>
+        <p>
+          Nuestro objetivo es entender rápido si podemos aportar valor, proponer una mejora clara
+          y construir una solución que la empresa pueda utilizar con confianza.
+        </p>
+      </div>
+
+      <div class="faq-block">
+        <span class="section-tag">Preguntas frecuentes</span>
+
+        <h2>Dudas habituales antes de iniciar un proyecto.</h2>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question">¿El análisis inicial tiene coste?</button>
+            <div class="faq-answer">
+              <p>
+                No. Realizamos una primera evaluación sin coste para entender el problema,
+                valorar si existe una oportunidad real de mejora y orientar a la empresa sobre posibles soluciones.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">¿Es necesario tener los datos perfectamente organizados para empezar?</button>
+            <div class="faq-answer">
+              <p>
+                No. Muchas veces el primer paso consiste precisamente en entender dónde está la información,
+                cómo se genera y qué estructura necesita para poder utilizarse correctamente.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">¿Siempre hace falta inteligencia artificial?</button>
+            <div class="faq-answer">
+              <p>
+                No. La IA solo tiene sentido cuando aporta valor. En algunos casos la mejor solución es una
+                automatización sencilla, un flujo de datos bien diseñado o un dashboard claro.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">¿Podéis integraros con herramientas que la empresa ya utiliza?</button>
+            <div class="faq-answer">
+              <p>
+                Sí. Siempre que sea viable, buscamos trabajar sobre el ecosistema existente de la empresa:
+                hojas de cálculo, bases de datos, APIs, herramientas internas, dashboards o sistemas corporativos.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">¿Qué ocurre después del despliegue?</button>
+            <div class="faq-answer">
+              <p>
+                Ofrecemos mantenimiento posterior para revisar el funcionamiento, resolver incidencias,
+                adaptar la solución a cambios del negocio y plantear mejoras evolutivas cuando sea necesario.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">¿Qué tipo de empresa puede beneficiarse de KW?</button>
+            <div class="faq-answer">
+              <p>
+                Cualquier empresa que trabaje con datos, informes, tareas repetitivas, documentación o procesos
+                manuales puede encontrar oportunidades de mejora mediante automatización e ingeniería de datos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="contacto">
-      <span class="section-tag">Contacto</span>
+    <!-- NOSOTROS -->
+    <section id="nosotros" class="page boxed-page">
+      <span class="section-tag">Quiénes somos</span>
 
-      <h2>¿Tu empresa pierde tiempo en tareas manuales?</h2>
+      <h2>KW combina ingeniería de datos, telecomunicaciones e inteligencia artificial aplicada a problemas reales de empresa.</h2>
 
       <p>
-        Podemos estudiar tu caso, detectar oportunidades de automatización y ayudarte a convertir
-        procesos repetitivos en sistemas más eficientes.
+        KW nace con una idea clara: ayudar a empresas a trabajar mejor mediante soluciones tecnológicas
+        útiles, bien diseñadas y orientadas a impacto.
       </p>
 
-      <a href="mailto:contacto@kw.com">contacto@kw.com</a>
+      <div class="team-grid">
+        <article class="team-card">
+          <div class="photo-placeholder">KV</div>
+          <span class="service-number">Kevin Vargas</span>
+          <h3>Ingeniero de datos</h3>
+          <p>
+            Ingeniero de datos con formación especializada en ciencia de datos, automatización e inteligencia artificial.
+            Su experiencia combina entornos financieros, investigación universitaria y consultoría tecnológica,
+            aportando una visión técnica orientada a resolver problemas reales de negocio.
+          </p>
+          <p>
+            Trabaja en el diseño de flujos de datos fiables, integración de información desde distintas fuentes,
+            automatización de procesos, entornos cloud, prácticas DevOps y despliegues controlados.
+          </p>
+          <p>
+            Su perfil aporta a KW una base sólida en ingeniería de datos, machine learning, automatización
+            y construcción de soluciones preparadas para operar en entornos exigentes.
+          </p>
+        </article>
+
+        <article class="team-card">
+          <div class="photo-placeholder">WR</div>
+          <span class="service-number">Wilson Robles</span>
+          <h3>Ingeniero de telecomunicaciones</h3>
+          <p>
+            Ingeniero de telecomunicaciones con experiencia en inteligencia artificial conversacional,
+            procesamiento del lenguaje natural, large language models, chatbots personalizados
+            y soluciones basadas en deep learning.
+          </p>
+          <p>
+            Su trayectoria en entornos de telecomunicaciones le aporta una visión analítica,
+            orientada a la detección temprana de errores, la robustez de los sistemas y la mejora continua.
+          </p>
+          <p>
+            Su perfil aporta a KW profundidad técnica en IA, modelos de lenguaje, sistemas conversacionales,
+            machine learning y diseño de soluciones inteligentes adaptadas a cada empresa.
+          </p>
+        </article>
+      </div>
+
+      <div class="mission-grid">
+        <div>
+          <h3>Misión</h3>
+          <p>Ayudar a empresas a transformar procesos ineficientes en sistemas digitales útiles, fiables y escalables.</p>
+        </div>
+
+        <div>
+          <h3>Visión</h3>
+          <p>Ser un socio tecnológico de confianza para empresas que quieren incorporar datos, automatización e IA con criterio.</p>
+        </div>
+
+        <div>
+          <h3>Principios</h3>
+          <p>Claridad, utilidad, rigor técnico, orientación al negocio, mantenimiento y construcción de soluciones sostenibles.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="page contact-page">
+      <span class="section-tag">Contacto</span>
+
+      <h2>Empieza a reducir tiempo, errores y carga manual en tu empresa.</h2>
+
+      <p>
+        Cuéntanos qué proceso quieres mejorar. Revisaremos tu caso y te orientaremos con una primera evaluación
+        sin coste, sin compromiso y adaptada a tus herramientas actuales.
+      </p>
+
+      <div class="contact-layout">
+        <div class="contact-copy">
+          <h3>Solicita tu análisis inicial</h3>
+          <p>
+            Escríbenos qué tarea, informe, flujo de datos o proceso operativo te gustaría optimizar.
+            Cuanto más contexto nos des, mejor podremos valorar si existe una oportunidad real de mejora.
+          </p>
+
+          <div class="contact-benefits">
+            <span>Diagnóstico inicial sin coste</span>
+            <span>Respuesta orientada a negocio</span>
+            <span>Automatización, datos e IA aplicada</span>
+          </div>
+
+          <a class="contact-email-link" href="mailto:kwdataintelligence@gmail.com">kwdataintelligence@gmail.com</a>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+          </div>
+
+          <div class="form-group">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="tuempresa@email.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="mensaje">¿Qué proceso quieres mejorar?</label>
+            <textarea id="mensaje" name="mensaje" rows="6" placeholder="Explícanos brevemente el problema, proceso o tarea que quieres automatizar." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary">Enviar consulta</button>
+
+          <p class="form-note">
+            Al enviar, se abrirá tu aplicación de correo con el mensaje preparado para KW.
+          </p>
+        </form>
+      </div>
     </section>
 
   </main>
