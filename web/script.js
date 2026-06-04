@@ -5,6 +5,17 @@
 const pageLinks = document.querySelectorAll("[data-page]");
 const pages = document.querySelectorAll(".page");
 
+const menuToggle = document.querySelector(".menu-toggle");
+const navMenu = document.querySelector(".nav-menu");
+
+function closeMobileMenu() {
+  if (menuToggle && navMenu) {
+    menuToggle.classList.remove("active");
+    navMenu.classList.remove("open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  }
+}
+
 function showPage(pageId) {
   pages.forEach((page) => {
     page.classList.remove("active-page");
@@ -28,6 +39,17 @@ function showPage(pageId) {
       link.classList.add("active-link");
     }
   });
+
+  closeMobileMenu();
+}
+
+if (menuToggle && navMenu) {
+  menuToggle.addEventListener("click", () => {
+    const isOpen = navMenu.classList.toggle("open");
+
+    menuToggle.classList.toggle("active", isOpen);
+    menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
 }
 
 pageLinks.forEach((link) => {
@@ -49,6 +71,12 @@ window.addEventListener("load", () => {
 window.addEventListener("popstate", () => {
   const pageId = window.location.hash.replace("#", "") || "inicio";
   showPage(pageId);
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 768) {
+    closeMobileMenu();
+  }
 });
 
 // =========================
