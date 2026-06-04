@@ -88,17 +88,64 @@ const faqItems = document.querySelectorAll(".faq-item");
 faqItems.forEach((item) => {
   const question = item.querySelector(".faq-question");
 
-  question.addEventListener("click", () => {
-    item.classList.toggle("active");
-  });
+  if (question) {
+    question.addEventListener("click", () => {
+      item.classList.toggle("active");
+    });
+  }
 });
+
+// =========================
+// FORMULARIO DE CONTACTO MAILTO
+// =========================
+
+const contactForm = document.querySelector(".contact-form");
+
+if (contactForm) {
+  contactForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const nameInput = contactForm.querySelector("#nombre");
+    const surnameInput = contactForm.querySelector("#apellidos");
+    const emailInput = contactForm.querySelector("#email");
+    const messageInput = contactForm.querySelector("#mensaje");
+
+    const nombre = nameInput ? nameInput.value.trim() : "";
+    const apellidos = surnameInput ? surnameInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
+    const mensaje = messageInput ? messageInput.value.trim() : "";
+
+    const destinatario = "kwdataintelligence@gmail.com";
+    const asunto = `Solicitud de análisis inicial - ${nombre} ${apellidos}`.trim();
+
+    const cuerpo = [
+      "Hola KW,",
+      "",
+      "Me gustaría solicitar un análisis inicial para valorar posibles mejoras en mi empresa.",
+      "",
+      "Datos de contacto:",
+      `Nombre: ${nombre}`,
+      `Apellidos: ${apellidos}`,
+      `Email: ${email}`,
+      "",
+      "Mensaje:",
+      mensaje,
+      "",
+      "Gracias."
+    ].join("\n");
+
+    const mailtoLink = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+    window.location.href = mailtoLink;
+  });
+}
 
 // =========================
 // ANIMACIONES AL HACER SCROLL
 // =========================
 
 const animatedElements = document.querySelectorAll(
-  "article, .impact-grid div, .mission-grid div, .method-note, .faq-item, .roadmap-step, .roadmap-content"
+  "article, .impact-grid div, .mission-grid div, .method-note, .faq-item, .roadmap-step, .roadmap-content, .contact-form-wrap"
 );
 
 const observer = new IntersectionObserver(
