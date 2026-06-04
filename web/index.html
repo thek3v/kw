@@ -39,13 +39,13 @@
 
     <!-- INICIO -->
     <section id="inicio" class="page active-page">
-      <div class="hero no-fade">
+      <div class="hero hero-centered no-fade">
         <div class="hero-content">
           <span class="eyebrow">Automatización · Ingeniería de datos · IA aplicada</span>
 
           <h1>
             <span class="brand-title">KW</span>
-            Transformamos procesos operativos en sistemas digitales más eficientes, integrados y preparados para escalar.
+            <span class="hero-title-text">Transformamos procesos operativos en sistemas digitales más eficientes, integrados y preparados para escalar.</span>
           </h1>
 
           <p>
@@ -59,16 +59,18 @@
           </div>
         </div>
 
-        <div class="hero-card no-fade">
+        <div class="hero-card hero-card-horizontal no-fade">
           <p class="card-label">De la operación al valor</p>
 
-          <div class="flow-step">Proceso manual</div>
-          <div class="flow-line"></div>
-          <div class="flow-step">Datos dispersos</div>
-          <div class="flow-line"></div>
-          <div class="flow-step">Sistema automatizado</div>
-          <div class="flow-line"></div>
-          <div class="flow-step active">Decisión inteligente</div>
+          <div class="flow-horizontal">
+            <div class="flow-step">Proceso manual</div>
+            <div class="flow-line"></div>
+            <div class="flow-step">Datos dispersos</div>
+            <div class="flow-line"></div>
+            <div class="flow-step">Sistema automatizado</div>
+            <div class="flow-line"></div>
+            <div class="flow-step active">Decisión inteligente</div>
+          </div>
         </div>
       </div>
 
@@ -560,14 +562,58 @@
     <section id="contacto" class="page contact-page">
       <span class="section-tag">Contacto</span>
 
-      <h2>Cuéntanos qué proceso quieres mejorar.</h2>
+      <h2>Empieza a reducir tiempo, errores y carga manual en tu empresa.</h2>
 
       <p>
-        Podemos realizar una primera evaluación sin coste, analizar el caso de tu empresa
-        y proponerte una solución adaptada a tus procesos, herramientas y objetivos.
+        Cuéntanos qué proceso quieres mejorar. Revisaremos tu caso y te orientaremos con una primera evaluación
+        sin coste, sin compromiso y adaptada a tus herramientas actuales.
       </p>
 
-      <a href="mailto:kwdataintelligence@gmail.com">kwdataintelligence@gmail.com</a>
+      <div class="contact-layout">
+        <div class="contact-copy">
+          <h3>Solicita tu análisis inicial</h3>
+          <p>
+            Escríbenos qué tarea, informe, flujo de datos o proceso operativo te gustaría optimizar.
+            Cuanto más contexto nos des, mejor podremos valorar si existe una oportunidad real de mejora.
+          </p>
+
+          <div class="contact-benefits">
+            <span>Diagnóstico inicial sin coste</span>
+            <span>Respuesta orientada a negocio</span>
+            <span>Automatización, datos e IA aplicada</span>
+          </div>
+
+          <a class="contact-email-link" href="mailto:kwdataintelligence@gmail.com">kwdataintelligence@gmail.com</a>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+          </div>
+
+          <div class="form-group">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="tuempresa@email.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="mensaje">¿Qué proceso quieres mejorar?</label>
+            <textarea id="mensaje" name="mensaje" rows="6" placeholder="Explícanos brevemente el problema, proceso o tarea que quieres automatizar." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary">Enviar consulta</button>
+
+          <p class="form-note">
+            Al enviar, se abrirá tu aplicación de correo con el mensaje preparado para KW.
+          </p>
+        </form>
+      </div>
     </section>
 
   </main>
