@@ -936,3 +936,41 @@ footer {
   opacity: 1 !important;
   transform: none !important;
 }
+
+@media (max-width: 768px) {
+
+  body {
+    background: #050816 !important;
+  }
+
+  body::before,
+  body::after,
+  main::before,
+  main::after {
+    opacity: 0.15;
+    filter: none;
+  }
+
+  article,
+  .hero-card,
+  .roadmap-content,
+  .faq-item,
+  .boxed-page,
+  .contact-page {
+    background: rgba(10, 15, 35, 0.92) !important;
+    backdrop-filter: none !important;
+  }
+
+  .hero {
+    gap: 30px;
+  }
+
+  .hero-card {
+    max-width: 100%;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+}
