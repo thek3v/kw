@@ -6,10 +6,11 @@ on:
   push:
     branches:
       - develop
+      - main
 
 jobs:
   build-snapshot:
-    name: Build DEV snapshot artifact
+    name: Build SNAPSHOT web artifact
     runs-on: ubuntu-latest
 
     steps:
@@ -22,18 +23,21 @@ jobs:
           VERSION=$(cat VERSION)
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           BUILD_TS=$(date -u +"%Y%m%d_%H%M")
-          ARTIFACT_NAME="kw-web-${VERSION}-${BUILD_TS}-${SHORT_SHA}"
+          BRANCH_NAME="${{ github.ref_name }}"
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | tr '/' '-')
+          ARTIFACT_NAME="kw-web-${VERSION}-${SAFE_BRANCH}-${BUILD_TS}-${SHORT_SHA}"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "build_ts=$BUILD_TS" >> "$GITHUB_OUTPUT"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Validate snapshot version
         run: |
           VERSION="${{ steps.meta.outputs.version }}"
           if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
-            echo "Integration builds must use a SNAPSHOT version"
+            echo "::error::Integration builds must use a SNAPSHOT version. Current VERSION: $VERSION"
             exit 1
           fi
 
@@ -48,14 +52,19 @@ jobs:
           echo "${{ steps.meta.outputs.artifact_name }}" > ARTIFACT_NAME
           date -u +"%Y-%m-%dT%H:%M:%SZ" > BUILD_DATE
 
-      - name: Prepare DEV snapshot artifact
+      - name: Prepare SNAPSHOT web artifact
         run: |
           mkdir -p build/web
 
           cp web/index.html build/web/
           cp web/styles.css build/web/
           cp web/script.js build/web/
-          cp -r web/assets build/web/
+
+          if [ -d web/assets ]; then
+            cp -r web/assets build/web/
+          else
+            mkdir -p build/web/assets
+          fi
 
           cp README.md build/
           cp VERSION build/
@@ -73,8 +82,9 @@ jobs:
           echo "Artifact generated:"
           echo "${{ steps.meta.outputs.artifact_name }}"
 
-      - name: Upload DEV snapshot artifact
+      - name: Upload SNAPSHOT web artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.meta.outputs.artifact_name }}
           path: build/
+          retention-days: 7
