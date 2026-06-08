@@ -1983,3 +1983,173 @@ footer {
     width: 100%;
   }
 }
+
+
+/* =========================================================
+   LINKEDIN - KW
+   Enlaces profesionales para perfiles, contacto y footer
+   ========================================================= */
+
+.linkedin-link,
+.footer-linkedin {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(6, 182, 212, 0.32);
+  background: rgba(6, 182, 212, 0.08);
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 850;
+  font-size: 0.92rem;
+  transition: all 0.25s ease;
+}
+
+.linkedin-link:hover,
+.footer-linkedin:hover {
+  transform: translateY(-2px);
+  border-color: rgba(6, 182, 212, 0.62);
+  background: rgba(6, 182, 212, 0.14);
+  box-shadow: 0 0 28px rgba(6, 182, 212, 0.18);
+}
+
+.linkedin-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #0a66c2, #06b6d4);
+  box-shadow: 0 0 18px rgba(10, 102, 194, 0.35);
+}
+
+.linkedin-link-personal {
+  margin: -4px 0 24px 0;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.contact-links .contact-email-link,
+.contact-links .linkedin-link {
+  margin: 0;
+}
+
+.footer-content {
+  max-width: var(--max-width);
+  margin: 0 auto 22px auto;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  text-align: left;
+}
+
+.footer-content strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.35rem;
+  font-weight: 950;
+  letter-spacing: -0.8px;
+  background: linear-gradient(135deg, var(--secondary), var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-content p {
+  color: var(--text-muted);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.footer-links a {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.footer-links > a:not(.footer-linkedin) {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.footer-links > a:not(.footer-linkedin):hover {
+  border-color: rgba(6, 182, 212, 0.48);
+  background: rgba(6, 182, 212, 0.08);
+}
+
+.footer-copy {
+  margin: 0 auto;
+  padding: 0 28px;
+  max-width: var(--max-width);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .linkedin-link,
+  .footer-linkedin {
+    justify-content: center;
+  }
+
+  .linkedin-link-personal {
+    margin-bottom: 20px;
+  }
+
+  .contact-links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contact-links .contact-email-link,
+  .contact-links .linkedin-link {
+    width: 100%;
+  }
+
+  .footer-content {
+    padding: 0 18px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-links {
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .footer-links a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer-copy {
+    padding: 0 18px;
+  }
+}

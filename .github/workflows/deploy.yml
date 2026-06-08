@@ -1,8 +1,7 @@
 name: Deploy
 
 run-name: >-
-  Deployment: ${{ inputs.artifact_name }} to
-  ${{ inputs.environment == 'dev' && 'certification development environment' || inputs.environment == 'pre' && 'pre-production environment' || 'production environment' }}
+  Deployment: ${{ inputs.artifact_name }} to DEV GitHub Pages
 
 on:
   workflow_dispatch:
@@ -34,7 +33,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy selected artifact
+    name: Deploy selected artifact to GitHub Pages
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
@@ -48,26 +47,28 @@ jobs:
           echo "Artifact name: ${{ inputs.artifact_name }}"
           echo "Source run ID: ${{ inputs.source_run_id }}"
           echo "Expected DEV URL: https://thek3v.github.io/kw/"
+          echo "::notice::10% - Inputs received correctly"
           echo "::endgroup::"
 
       - name: Validate deployment policy
         run: |
+          echo "::group::Validating deployment policy"
+
           ENV="${{ inputs.environment }}"
           ARTIFACT="${{ inputs.artifact_name }}"
 
-          if [[ "$ENV" == "dev" || "$ENV" == "pre" ]]; then
-            if [[ "$ARTIFACT" != *SNAPSHOT* ]]; then
-              echo "::error::DEV/PRE only accept SNAPSHOT artifacts"
-              exit 1
-            fi
+          if [[ "$ENV" != "dev" ]]; then
+            echo "::error::This KW workflow currently only deploys to dev."
+            exit 1
           fi
 
-          if [[ "$ENV" == "prod" ]]; then
-            if [[ "$ARTIFACT" == *SNAPSHOT* ]]; then
-              echo "::error::PROD does not accept SNAPSHOT artifacts"
-              exit 1
-            fi
+          if [[ "$ARTIFACT" != *SNAPSHOT* ]]; then
+            echo "::error::DEV only accepts SNAPSHOT artifacts."
+            exit 1
           fi
+
+          echo "::notice::25% - Deployment policy validated"
+          echo "::endgroup::"
 
       - name: List artifacts from source run
         env:
@@ -82,12 +83,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "::group::Downloading selected artifact"
           mkdir -p downloaded
 
           gh run download "${{ inputs.source_run_id }}" \
             --repo "${{ github.repository }}" \
             --name "${{ inputs.artifact_name }}" \
             --dir downloaded
+
+          echo "::notice::40% - Artifact downloaded"
+          echo "::endgroup::"
 
       - name: Inspect downloaded artifact
         run: |
@@ -99,6 +104,7 @@ jobs:
           echo ""
           echo "Files:"
           find downloaded -maxdepth 6 -type f | sort
+          echo "::notice::50% - Downloaded artifact inspected"
           echo "::endgroup::"
 
       - name: Resolve artifact paths
@@ -136,10 +142,13 @@ jobs:
           echo "artifact_root=$ARTIFACT_ROOT" >> "$GITHUB_OUTPUT"
           echo "web_root=$WEB_ROOT" >> "$GITHUB_OUTPUT"
 
+          echo "::notice::60% - Artifact paths resolved"
           echo "::endgroup::"
 
       - name: Validate downloaded web files
         run: |
+          echo "::group::Validating downloaded web files"
+
           WEB_ROOT="${{ steps.paths.outputs.web_root }}"
 
           echo "Validating web files at: $WEB_ROOT"
@@ -153,9 +162,13 @@ jobs:
             mkdir -p "$WEB_ROOT/assets"
           fi
 
+          echo "::notice::70% - Web files validated"
+          echo "::endgroup::"
+
       - name: Prepare GitHub Pages site
-        if: ${{ inputs.environment == 'dev' }}
         run: |
+          echo "::group::Preparing GitHub Pages site"
+
           ARTIFACT_ROOT="${{ steps.paths.outputs.artifact_root }}"
           WEB_ROOT="${{ steps.paths.outputs.web_root }}"
 
@@ -174,9 +187,15 @@ jobs:
           echo "Deployment URL: https://thek3v.github.io/kw/" >> site/DEPLOYMENT_INFO.txt
           echo "Artifact: ${{ inputs.artifact_name }}" >> site/DEPLOYMENT_INFO.txt
           echo "Source run id: ${{ inputs.source_run_id }}" >> site/DEPLOYMENT_INFO.txt
+          echo "Deployed by: ${{ github.actor }}" >> site/DEPLOYMENT_INFO.txt
+          echo "Deploy workflow ref: ${{ github.ref_name }}" >> site/DEPLOYMENT_INFO.txt
 
           if [ -f "$ARTIFACT_ROOT/BUILD_COMMIT" ]; then
             echo "Commit: $(cat "$ARTIFACT_ROOT/BUILD_COMMIT")" >> site/DEPLOYMENT_INFO.txt
+          fi
+
+          if [ -f "$ARTIFACT_ROOT/BUILD_BRANCH" ]; then
+            echo "Build branch: $(cat "$ARTIFACT_ROOT/BUILD_BRANCH")" >> site/DEPLOYMENT_INFO.txt
           fi
 
           if [ -f "$ARTIFACT_ROOT/BUILD_DATE" ]; then
@@ -191,23 +210,23 @@ jobs:
           echo "Final site content:"
           find site -maxdepth 4 -type f | sort
 
+          echo "::notice::80% - GitHub Pages site prepared"
+          echo "::endgroup::"
+
       - name: Configure GitHub Pages
-        if: ${{ inputs.environment == 'dev' }}
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        if: ${{ inputs.environment == 'dev' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
       - name: Deploy to GitHub Pages
-        if: ${{ inputs.environment == 'dev' }}
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Show deployment URL
-        if: ${{ inputs.environment == 'dev' }}
         run: |
           echo "::notice::Deployment URL: ${{ steps.deployment.outputs.page_url }}"
           echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "::notice::100% - Deployment completed successfully"

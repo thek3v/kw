@@ -6,6 +6,11 @@ on:
       - develop
       - main
 
+  push:
+    branches:
+      - develop
+      - main
+
 jobs:
   validate-static-web:
     name: Validate static web project
@@ -27,13 +32,17 @@ jobs:
           test -f web/index.html
           test -f web/styles.css
           test -f web/script.js
-          test -d web/assets
+
+          if [ ! -d web/assets ]; then
+            echo "web/assets directory not found. Creating it is recommended for static resources."
+          fi
 
       - name: Check GitHub Actions workflows exist
         run: |
           test -f .github/workflows/ci-checks.yml
           test -f .github/workflows/integration.yml
           test -f .github/workflows/deploy.yml
+          test -f .github/workflows/release.yml
 
       - name: Check forbidden files
         run: |
