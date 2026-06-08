@@ -21,7 +21,7 @@ on:
         type: string
 
       source_run_id:
-        description: "Run ID of the Integration workflow that produced the artifact"
+        description: "Run ID of the workflow that produced the artifact"
         required: true
         type: string
 
@@ -62,8 +62,12 @@ jobs:
             exit 1
           fi
 
-          if [[ "$ARTIFACT" != *SNAPSHOT* ]]; then
-            echo "::error::DEV only accepts SNAPSHOT artifacts."
+          if [[ "$ARTIFACT" == *SNAPSHOT* ]]; then
+            echo "::notice::DEV accepts SNAPSHOT artifact."
+          elif [[ "$ARTIFACT" == release-* ]]; then
+            echo "::notice::DEV accepts closed release artifact."
+          else
+            echo "::error::DEV only accepts SNAPSHOT artifacts or release-* artifacts."
             exit 1
           fi
 
