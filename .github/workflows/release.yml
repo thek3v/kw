@@ -1,0 +1,194 @@
+name: Release
+
+run-name: >-
+  Stable release from main
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    name: Create stable KW web release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch is main
+        run: |
+          echo "::group::Validating branch"
+          echo "Current ref: ${GITHUB_REF_NAME}"
+
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "::error::Release workflow must be run from branch 'main'."
+            exit 1
+          fi
+
+          echo "::notice::Branch validation OK"
+          echo "::endgroup::"
+
+      - name: Read release version
+        id: version
+        run: |
+          echo "::group::Reading VERSION"
+
+          BASE_VERSION=$(cat VERSION)
+          RELEASE_VERSION=${BASE_VERSION%-SNAPSHOT}
+
+          echo "Base version from file: $BASE_VERSION"
+          echo "Release version resolved to: $RELEASE_VERSION"
+
+          if ! echo "$RELEASE_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Release version must follow MAJOR.MINOR.PATCH format. Current: $RELEASE_VERSION"
+            exit 1
+          fi
+
+          echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "release_version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "::notice::Release version resolved"
+          echo "::endgroup::"
+
+      - name: Check release version is stable
+        run: |
+          echo "::group::Checking stable version"
+
+          RELEASE_VERSION="${{ steps.version.outputs.release_version }}"
+
+          if echo "$RELEASE_VERSION" | grep -q "SNAPSHOT"; then
+            echo "::error::Release version still contains SNAPSHOT."
+            exit 1
+          fi
+
+          echo "::notice::Stable version check passed"
+          echo "::endgroup::"
+
+      - name: Check tag does not already exist
+        run: |
+          echo "::group::Checking tag availability"
+
+          TAG="v${{ steps.version.outputs.release_version }}"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "::error::Tag $TAG already exists."
+            exit 1
+          fi
+
+          echo "::notice::Tag $TAG is available"
+          echo "::endgroup::"
+
+      - name: Prepare release package
+        run: |
+          echo "::group::Preparing release package"
+
+          RELEASE_VERSION="${{ steps.version.outputs.release_version }}"
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          BUILD_TS=$(date -u +"%Y%m%d_%H%M")
+          ARTIFACT_NAME="release-kw-web-${RELEASE_VERSION}"
+
+          mkdir -p build/web
+
+          cp web/index.html build/web/
+          cp web/styles.css build/web/
+          cp web/script.js build/web/
+
+          if [ -d web/assets ]; then
+            cp -r web/assets build/web/
+          else
+            mkdir -p build/web/assets
+          fi
+
+          cp README.md build/
+
+          echo "$RELEASE_VERSION" > build/VERSION
+          echo "$RELEASE_VERSION" > build/BUILD_VERSION
+          echo "${GITHUB_SHA}" > build/BUILD_COMMIT
+          echo "${GITHUB_REF_NAME}" > build/BUILD_BRANCH
+          echo "RELEASE" > build/BUILD_TYPE
+          echo "$SHORT_SHA" > build/BUILD_SHORT_SHA
+          echo "$BUILD_TS" > build/BUILD_TIMESTAMP
+          echo "$ARTIFACT_NAME" > build/ARTIFACT_NAME
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > build/BUILD_DATE
+
+          echo "Release artifact name: $ARTIFACT_NAME"
+          echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_ENV"
+          echo "release_zip=kw-web-${RELEASE_VERSION}.zip" >> "$GITHUB_ENV"
+
+          echo "::notice::Release package prepared"
+          echo "::endgroup::"
+
+      - name: Create release zip
+        run: |
+          echo "::group::Creating release zip"
+
+          cd build
+          zip -r "../${release_zip}" .
+          cd ..
+
+          echo "Release zip created: ${release_zip}"
+          echo "::notice::Release zip created"
+          echo "::endgroup::"
+
+      - name: Create git tag
+        run: |
+          echo "::group::Creating git tag"
+
+          TAG="v${{ steps.version.outputs.release_version }}"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+          echo "::notice::Tag $TAG pushed"
+          echo "::endgroup::"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Creating GitHub Release"
+
+          TAG="v${{ steps.version.outputs.release_version }}"
+
+          gh release create "$TAG" \
+            --title "KW web ${{ steps.version.outputs.release_version }}" \
+            --notes "Stable release for KW web version ${{ steps.version.outputs.release_version }}"
+
+          echo "::notice::GitHub Release created"
+          echo "::endgroup::"
+
+      - name: Upload zip to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Uploading release asset"
+
+          TAG="v${{ steps.version.outputs.release_version }}"
+
+          gh release upload "$TAG" \
+            "${release_zip}" \
+            --clobber
+
+          echo "::notice::Release asset uploaded"
+          echo "::endgroup::"
+
+      - name: Upload release artifact to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.artifact_name }}
+          path: build/
+          retention-days: 30
+
+      - name: Release summary
+        run: |
+          echo "::group::Release summary"
+          echo "Release version: ${{ steps.version.outputs.release_version }}"
+          echo "Tag: v${{ steps.version.outputs.release_version }}"
+          echo "Actions artifact: ${{ env.artifact_name }}"
+          echo "Release asset: ${{ env.release_zip }}"
+          echo "::notice::Release completed successfully"
+          echo "::endgroup::"
