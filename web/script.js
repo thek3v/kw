@@ -145,7 +145,7 @@ if (contactForm) {
 // =========================
 
 const animatedElements = document.querySelectorAll(
-  "article, .impact-grid div, .mission-grid div, .method-note, .faq-item, .roadmap-step, .roadmap-content, .contact-form-wrap"
+  "article, .impact-grid div, .mission-grid div, .method-note, .faq-item, .roadmap-step, .roadmap-content, .contact-form-wrap, .team-profile-row, .team-profile-card, .team-profile-content"
 );
 
 const observer = new IntersectionObserver(
