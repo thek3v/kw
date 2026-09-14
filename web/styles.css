@@ -302,7 +302,7 @@ section {
 
 .hero h1 {
   max-width: 900px;
-  font-size: clamp(2.8rem, 5.8vw, 5.5rem);
+  font-size: clamp(2.7rem, 4.5vw, 4.1rem);
   line-height: 0.98;
   letter-spacing: -3.6px;
   font-weight: 950;
@@ -1512,6 +1512,9 @@ footer {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 28px;
+  font-size: clamp(3rem, 5vw, 4.6rem);
+  line-height: 1.04;
+  letter-spacing: -2.8px;
 }
 
 .hero-title-text {
