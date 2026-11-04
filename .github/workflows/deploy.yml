@@ -1,7 +1,7 @@
 name: Deploy
 
 run-name: >-
-  Deployment: ${{ inputs.artifact_name }} to DEV GitHub Pages
+  Deployment: ${{ inputs.artifact_name }} to ${{ inputs.environment }}
 
 on:
   workflow_dispatch:
@@ -27,12 +27,14 @@ on:
 
 permissions:
   actions: read
+  checks: read
   contents: read
   pages: write
   id-token: write
 
 jobs:
   deploy:
+    if: ${{ inputs.environment == 'dev' }}
     name: Deploy selected artifact to GitHub Pages
     runs-on: ubuntu-latest
     environment:
@@ -234,3 +236,153 @@ jobs:
           echo "::notice::Deployment URL: ${{ steps.deployment.outputs.page_url }}"
           echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"
           echo "::notice::100% - Deployment completed successfully"
+
+  deploy-prod:
+    if: ${{ inputs.environment == 'prod' }}
+    name: Deploy stable release to Cloudflare Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+      url: https://kw-web-prod.pages.dev
+    concurrency:
+      group: kw-cloudflare-production
+      cancel-in-progress: false
+    env:
+      ARTIFACT_NAME: ${{ inputs.artifact_name }}
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Validate production deployment inputs and source run
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::Source run ID must be numeric"
+            exit 1
+          fi
+          if [[ ! "$ARTIFACT_NAME" =~ ^release-kw-web-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "::error::PROD only accepts release-kw-web-X.Y.Z artifacts"
+            exit 1
+          fi
+          VERSION="${BASH_REMATCH[1]}"
+          RUN_JSON=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}")
+          RUN_PATH=$(jq -r '.path' <<< "$RUN_JSON")
+          RUN_EVENT=$(jq -r '.event' <<< "$RUN_JSON")
+          RUN_BRANCH=$(jq -r '.head_branch' <<< "$RUN_JSON")
+          RUN_STATUS=$(jq -r '.conclusion' <<< "$RUN_JSON")
+          RUN_SHA=$(jq -r '.head_sha' <<< "$RUN_JSON")
+          if [[ "$RUN_PATH" != ".github/workflows/release.yml" || "$RUN_EVENT" != "workflow_dispatch" || "$RUN_BRANCH" != "main" || "$RUN_STATUS" != "success" ]]; then
+            echo "::error::Source must be a successful manual Release workflow run on main"
+            exit 1
+          fi
+          if [[ ! "$RUN_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Invalid source commit SHA"
+            exit 1
+          fi
+          TAG_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/v${VERSION}" --jq '.object.sha')
+          TAG_TYPE=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/v${VERSION}" --jq '.object.type')
+          if [[ "$TAG_TYPE" == "tag" ]]; then
+            TAG_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${TAG_SHA}" --jq '.object.sha')
+          fi
+          if [[ "$TAG_SHA" != "$RUN_SHA" ]]; then
+            echo "::error::Release tag does not point to source run commit"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$RUN_SHA" >> "$GITHUB_OUTPUT"
+          echo "Validated release v$VERSION from main at $RUN_SHA"
+
+      - name: Verify CI Checks succeeded for release commit
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CI_RUNS=$(gh api -X GET "repos/${GITHUB_REPOSITORY}/actions/workflows/ci-checks.yml/runs" \
+            -f head_sha="$SOURCE_SHA" -f event=push -f status=success -f per_page=100)
+          COUNT=$(jq '[.workflow_runs[] | select(.head_sha == env.SOURCE_SHA and .head_branch == "main" and .conclusion == "success")] | length' <<< "$CI_RUNS")
+          if [[ "$COUNT" -lt 1 ]]; then
+            echo "::error::No successful push CI Checks run on main for release commit"
+            exit 1
+          fi
+          echo "Successful CI Checks runs for release commit: $COUNT"
+
+      - name: Download selected release artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p downloaded
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$ARTIFACT_NAME" \
+            --dir downloaded
+
+      - name: Validate release contents and prepare production site
+        env:
+          RELEASE_VERSION: ${{ steps.source.outputs.version }}
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f downloaded/VERSION
+          test -f downloaded/BUILD_VERSION
+          test -f downloaded/BUILD_COMMIT
+          test -f downloaded/BUILD_BRANCH
+          test -f downloaded/BUILD_TYPE
+          test -f downloaded/ARTIFACT_NAME
+          [[ "$(cat downloaded/VERSION)" == "$RELEASE_VERSION" ]]
+          [[ "$(cat downloaded/BUILD_VERSION)" == "$RELEASE_VERSION" ]]
+          [[ "$(cat downloaded/BUILD_COMMIT)" == "$SOURCE_SHA" ]]
+          [[ "$(cat downloaded/BUILD_BRANCH)" == "main" ]]
+          [[ "$(cat downloaded/BUILD_TYPE)" == "RELEASE" ]]
+          [[ "$(cat downloaded/ARTIFACT_NAME)" == "$ARTIFACT_NAME" ]]
+          test -f downloaded/web/index.html
+          test -f downloaded/web/styles.css
+          test -f downloaded/web/script.js
+          mkdir -p site
+          cp -a downloaded/web/. site/
+          cp downloaded/VERSION site/
+          {
+            echo "Environment: PROD"
+            echo "Deployment URL: https://kw-web-prod.pages.dev"
+            echo "Artifact: $ARTIFACT_NAME"
+            echo "Source run id: $SOURCE_RUN_ID"
+            echo "Deployed by: $GITHUB_ACTOR"
+            echo "Deploy workflow ref: $GITHUB_REF_NAME"
+            echo "Commit: $SOURCE_SHA"
+            echo "Build branch: main"
+            if [[ -f downloaded/BUILD_DATE ]]; then
+              echo "Build date: $(cat downloaded/BUILD_DATE)"
+            fi
+            if [[ -f downloaded/BUILD_TIMESTAMP ]]; then
+              echo "Build timestamp: $(cat downloaded/BUILD_TIMESTAMP)"
+            fi
+          } > site/DEPLOYMENT_INFO.txt
+          find site -maxdepth 4 -type f | sort
+
+      - name: Deploy release to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "::error::Cloudflare repository secrets are missing"
+            exit 1
+          fi
+          npx --yes wrangler@3 pages deploy site \
+            --project-name=kw-web-prod \
+            --branch=main
+
+  reject-pre:
+    if: ${{ inputs.environment == 'pre' }}
+    name: PRE is not configured
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain PRE status
+        run: |
+          echo "::error::PRE deployment is not configured for KW yet."
+          exit 1
