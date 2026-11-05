@@ -2544,3 +2544,38 @@ footer {
   }
 }
 
+
+
+/* =========================================================
+   FOTOGRAFÍA DE PERFIL - KEVIN VARGAS
+   Mantiene intactos los placeholders de los demás perfiles
+   ========================================================= */
+
+.team-profile-card .photo-placeholder.photo-profile {
+  width: 168px;
+  height: 168px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 30px;
+  flex: 0 0 auto;
+  background: rgba(6, 182, 212, 0.10);
+  border: 1px solid rgba(6, 182, 212, 0.48);
+  box-shadow: 0 0 42px rgba(6, 182, 212, 0.22);
+}
+
+.team-profile-card .photo-profile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 768px) {
+  .team-profile-card .photo-placeholder.photo-profile {
+    width: 136px !important;
+    height: 136px !important;
+    border-radius: 26px !important;
+    margin-bottom: 20px !important;
+  }
+}
