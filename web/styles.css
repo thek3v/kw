@@ -2579,3 +2579,71 @@ footer {
     margin-bottom: 20px !important;
   }
 }
+
+
+
+/* KW V3 — hero de ancho completo, independiente del contenedor main */
+#inicio .kw-hero-v2.hero.hero-centered {
+  position:relative; isolation:isolate; box-sizing:border-box;
+  width:100vw; max-width:none; min-width:0;
+  left:auto; right:auto; transform:none;
+  margin: -70px 0 48px calc(50% - 50vw);
+  padding: 74px 24px 86px;
+  min-height: min(870px, calc(100svh - 80px));
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0; text-align:center; overflow:hidden; border-radius:0;
+  background: radial-gradient(ellipse 56% 48% at 50% 58%,rgba(23,20,66,.55),transparent 80%),
+    linear-gradient(120deg,#08091e,#030d1b 54%,#031822);
+}
+#inicio .kw-hero-v2::before {display:none}
+#inicio .kw-hero-canvas {position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:1}
+#inicio .kw-hero-aura {position:absolute;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(ellipse 38% 30% at 8% 36%,rgba(109,34,194,.14),transparent),
+  radial-gradient(ellipse 38% 30% at 92% 36%,rgba(4,166,206,.12),transparent)}
+#inicio .kw-hero-content {position:relative;z-index:2;width:min(100%,1060px);max-width:1060px;
+  margin:0 auto;display:flex;flex-direction:column;align-items:center;min-width:0}
+#inicio .kw-hero-v2 .eyebrow {margin:0 auto 18px;max-width:100%;font-size:clamp(.68rem,.9vw,.85rem);
+  padding:9px 17px;letter-spacing:.015em;text-transform:none;background:rgba(1,17,33,.76);backdrop-filter:blur(14px)}
+#inicio .kw-hero-v2 h1 {display:flex;flex-direction:column;align-items:center;gap:0;
+  width:100%;max-width:1060px;margin:0 auto 18px;line-height:1.1;letter-spacing:-.035em;
+  font-size:clamp(2.1rem,4.1vw,4.1rem);font-weight:850}
+#inicio .kw-hero-v2 .brand-title {display:block;width:auto;max-width:100%;margin:0 auto 25px;
+  font-size:clamp(7rem,15vw,13rem);line-height:.95;letter-spacing:-.09em;
+  background:linear-gradient(115deg,#16c6ee 5%,#8a3ff0 44%,#a74bf5 65%,#23e6c5 98%);
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 34px rgba(98,63,232,.18))}
+#inicio .kw-hero-v2 .hero-title-text {display:block;max-width:900px;width:100%;margin:0 auto;text-wrap:balance}
+#inicio .kw-hero-v2 .kw-hero-content>p {max-width:680px;margin:0 auto 26px;
+  font-size:clamp(.96rem,1.2vw,1.15rem);line-height:1.65;color:#b9c9da;text-wrap:balance}
+#inicio .kw-hero-v2 .hero-actions {display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:0 auto}
+#inicio .kw-hero-v2 .hero-actions a {padding:14px 23px;border-radius:14px}
+#inicio .kw-hero-v2 .btn-primary {background:linear-gradient(105deg,#06c7dc,#4675f3,#9b3ef2);box-shadow:0 9px 32px rgba(36,149,237,.22)}
+#inicio .kw-hero-v2 .btn-secondary {background:rgba(4,14,33,.77);border:1px solid rgba(126,173,215,.34);backdrop-filter:blur(12px)}
+#inicio .kw-hero-signals {display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:28px auto 0}
+#inicio .kw-hero-signals span {font-size:.73rem;color:#adc7dc;border:1px solid rgba(93,154,208,.2);background:rgba(4,14,35,.6);padding:7px 14px;border-radius:99px}
+#inicio .kw-hero-bottom {position:absolute;z-index:2;bottom:20px;left:5%;right:5%;display:flex;justify-content:space-between;color:rgba(160,192,211,.4);font-size:.65rem;letter-spacing:.14em}
+@media(max-width:768px){
+ #inicio .kw-hero-v2.hero.hero-centered {min-height:740px;min-height:calc(100svh - 65px);padding:65px 18px 60px;margin-top:-70px}
+ #inicio .kw-hero-v2 .brand-title {font-size:clamp(6.3rem,26vw,9rem);margin-bottom:22px}
+ #inicio .kw-hero-v2 h1 {font-size:clamp(2rem,7.5vw,3rem);line-height:1.14}
+ #inicio .kw-hero-v2 .hero-actions {width:100%;flex-direction:column;max-width:350px}
+ #inicio .kw-hero-v2 .hero-actions a {width:100%}
+ #inicio .kw-hero-bottom {display:none}
+}
+@media(prefers-reduced-motion:reduce){#inicio .kw-hero-v2 *{animation:none!important;transition:none!important}}
+
+
+/* KW — Fondo continuo: el hero utiliza la misma atmósfera que el resto */
+#inicio .kw-hero-v2.hero.hero-centered {
+  background: transparent;
+  isolation: auto;
+}
+/* La malla en perspectiva del canvas se suaviza para que no sustituya
+   la cuadrícula global animada que ya dibuja body::before. */
+#inicio .kw-hero-canvas { opacity: .78; }
+/* Se conserva el halo de color, sin crear un panel opaco. */
+#inicio .kw-hero-aura {
+  background:
+    radial-gradient(ellipse 42% 42% at 9% 36%, rgba(137,48,241,.25), transparent 76%),
+    radial-gradient(ellipse 42% 42% at 91% 36%, rgba(4,199,242,.23), transparent 76%);
+}
