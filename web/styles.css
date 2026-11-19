@@ -1065,7 +1065,7 @@ footer {
   }
 }
 /* =========================================================
-   OPTIMIZACIÓN MÓVIL PREMIUM - KW
+   OPTIMIZACIÓN MÓVIL PREMIUM - KOXEN
    Pegar este bloque al FINAL del archivo styles.css
    ========================================================= */
 
@@ -1482,7 +1482,7 @@ footer {
 
 
 /* =========================================================
-   FASE ESCRITORIO PREMIUM - KW
+   FASE ESCRITORIO PREMIUM - KOXEN
    Hero centrado + roadmap alternado + CTA con formulario
    ========================================================= */
 
@@ -1989,7 +1989,7 @@ footer {
 
 
 /* =========================================================
-   LINKEDIN - KW
+   LINKEDIN - KOXEN
    Enlaces profesionales para perfiles, contacto y footer
    ========================================================= */
 
@@ -2159,7 +2159,7 @@ footer {
 
 
 /* =========================================================
-   EQUIPO KW - LAYOUT ALTERNADO PREMIUM
+   EQUIPO KOXEN - LAYOUT ALTERNADO PREMIUM
    ========================================================= */
 
 .team-page > p {
@@ -2400,7 +2400,7 @@ footer {
 
 
 /* =========================================================
-   FOOTER DEFINITIVO + SEO VISUAL - KW
+   FOOTER DEFINITIVO + SEO VISUAL - KOXEN
    ========================================================= */
 
 .site-footer {
@@ -2582,7 +2582,7 @@ footer {
 
 
 
-/* KW V3 — hero de ancho completo, independiente del contenedor main */
+/* KOXEN V3 — hero de ancho completo, independiente del contenedor main */
 #inicio .kw-hero-v2.hero.hero-centered {
   position:relative; isolation:isolate; box-sizing:border-box;
   width:100vw; max-width:none; min-width:0;
@@ -2633,7 +2633,7 @@ footer {
 @media(prefers-reduced-motion:reduce){#inicio .kw-hero-v2 *{animation:none!important;transition:none!important}}
 
 
-/* KW — Fondo continuo: el hero utiliza la misma atmósfera que el resto */
+/* KOXEN — Fondo continuo: el hero utiliza la misma atmósfera que el resto */
 #inicio .kw-hero-v2.hero.hero-centered {
   background: transparent;
   isolation: auto;
@@ -2648,7 +2648,7 @@ footer {
     radial-gradient(ellipse 42% 42% at 91% 36%, rgba(4,199,242,.23), transparent 76%);
 }
 
-/* KW — Corrección definitiva del Hero móvil */
+/* KOXEN — Corrección definitiva del Hero móvil */
 @media (max-width: 768px) {
 
   #inicio .kw-hero-v2.hero.hero-centered {
@@ -2667,4 +2667,9 @@ footer {
   #inicio .kw-hero-content {
     width: 100%;
   }
+}
+/* KOXEN: ajuste tipográfico del nombre para evitar desbordamiento sin alterar el diseño */
+#inicio .kw-hero-v2 .brand-title { font-size: clamp(4.1rem, 10vw, 8.2rem); letter-spacing: -.065em; }
+@media (max-width: 768px) {
+  #inicio .kw-hero-v2 .brand-title { font-size: clamp(2.7rem, 13vw, 5.4rem); letter-spacing: -.065em; }
 }
