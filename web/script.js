@@ -115,11 +115,11 @@ if (contactForm) {
     const email = emailInput ? emailInput.value.trim() : "";
     const mensaje = messageInput ? messageInput.value.trim() : "";
 
-    const destinatario = "kwdataintelligence@gmail.com";
+    const destinatario = "koxenteam@gmail.com";
     const asunto = `Solicitud de análisis inicial - ${nombre} ${apellidos}`.trim();
 
     const cuerpo = [
-      "Hola KW,",
+      "Hola KOXEN,",
       "",
       "Me gustaría solicitar un análisis inicial para valorar posibles mejoras en mi empresa.",
       "",
@@ -169,7 +169,7 @@ animatedElements.forEach((element) => {
 });
 
 
-// KW V3 — ondas de datos y malla elástica con relieve hacia el espectador
+// KOXEN V3 — ondas de datos y malla elástica con relieve hacia el espectador
 (() => {
   const canvas = document.getElementById('kwHeroCanvas');
   const hero = canvas?.closest('.kw-hero-v2');
