@@ -2647,3 +2647,17 @@ footer {
     radial-gradient(ellipse 42% 42% at 9% 36%, rgba(137,48,241,.25), transparent 76%),
     radial-gradient(ellipse 42% 42% at 91% 36%, rgba(4,199,242,.23), transparent 76%);
 }
+
+/* KW — Ajuste Hero en móviles */
+@media (max-width: 768px) {
+  #inicio .kw-hero-v2.hero.hero-centered {
+    margin-top: 0;
+    padding-top: 48px;
+    padding-bottom: 60px;
+    min-height: auto;
+  }
+
+  #inicio .kw-hero-v2 .eyebrow {
+    margin-bottom: 24px;
+  }
+}
