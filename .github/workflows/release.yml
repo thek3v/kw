@@ -97,6 +97,8 @@ jobs:
           cp web/index.html build/web/
           cp web/styles.css build/web/
           cp web/script.js build/web/
+          cp web/sitemap.xml build/web/
+          cp web/robots.txt build/web/
 
           if [ -d web/assets ]; then
             cp -r web/assets build/web/

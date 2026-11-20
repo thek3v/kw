@@ -183,6 +183,8 @@ jobs:
           cp "$WEB_ROOT/index.html" site/
           cp "$WEB_ROOT/styles.css" site/
           cp "$WEB_ROOT/script.js" site/
+          cp "$WEB_ROOT/sitemap.xml" site/
+          cp "$WEB_ROOT/robots.txt" site/
           cp -r "$WEB_ROOT/assets" site/
 
           if [ -f "$ARTIFACT_ROOT/VERSION" ]; then
